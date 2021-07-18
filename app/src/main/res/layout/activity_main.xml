@@ -15,16 +15,7 @@
         />
 
 
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/curColor"
-        android:layout_width="10dp"
-        android:layout_height="10dp"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:layout_margin="5dp"
-        android:background="@drawable/color_btn"
-        android:backgroundTint="@color/colorPrimary"
-        />
+
 
 
     <LinearLayout
@@ -119,6 +110,20 @@
         android:layout_height="50dp"
         android:background="@drawable/color_doc"
         android:layout_alignParentBottom="true"/>
+
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/curColor"
+        android:layout_width="5dp"
+        android:layout_height="5dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true"
+
+        android:layout_marginLeft="15dp"
+        android:layout_marginVertical="30dp"
+        android:layout_marginBottom="5dp"
+        android:background="@drawable/color_btn"
+        android:backgroundTint="@color/colorPrimary" />
 
     <LinearLayout
         android:id="@+id/colorPane"

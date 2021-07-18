@@ -1,6 +1,7 @@
 package com.example.paintbuddy;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -28,6 +29,7 @@ public class CanvasView extends View {
     static int currentAlpha = 255;
     static float currentStrock = 5f;
     public static Boolean erase = false;
+    public static Bitmap bitmap;
 
 
     public CanvasView(Context context) {
@@ -99,6 +101,7 @@ public class CanvasView extends View {
 
         while (it1.hasNext() && it2.hasNext()) {
             canvas.drawPath(it1.next(), it2.next());
+//            canvas.setBitmap(bitmap);
             invalidate();
         }
 
