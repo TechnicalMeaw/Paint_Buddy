@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#6200EE</color>
+    <color name="colorPrimaryDark">#3700B3</color>
+    <color name="colorAccent">#03DAC5</color>
+    <color name="yellow">#FFBB33</color>
+    <color name="eraser">#FAFAFA</color>
+    <color name="purple">#AA66CC</color>
+    <color name="red">#FF4444</color>
+    <color name="green">#669900</color>
+    <color name="blue">#0099CC</color>
+    <color name="black">#000000</color>
+</resources>

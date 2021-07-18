@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
+    <item
+        android:id="@+id/undoBtn"
+        android:icon="@android:drawable/ic_menu_revert"
+        android:title="undo"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/clearBtn"
+        android:icon="@android:drawable/ic_menu_delete"
+        android:title="Erase"
+        app:showAsAction="ifRoom" />
+
+</menu>
