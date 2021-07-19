@@ -1,7 +1,16 @@
 package com.example.paintbuddy
 
+import android.content.ContentValues
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.Bitmap.createBitmap
+import android.graphics.Canvas
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
+import android.os.Environment
+import android.os.Handler
+import android.provider.MediaStore
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
@@ -13,6 +22,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.example.paintbuddy.CanvasView.*
 import kotlinx.android.synthetic.main.activity_main.*
+import java.io.File
+import java.io.FileOutputStream
+import java.io.OutputStream
 
 
 class MainActivity : AppCompatActivity() {
@@ -57,6 +69,8 @@ class MainActivity : AppCompatActivity() {
         })
 
 
+
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -69,9 +83,17 @@ class MainActivity : AppCompatActivity() {
         when( item.itemId){
             R.id.undoBtn -> {
                 undo()
+                canvas.invalidate()
+            }
+            R.id.redoBtn -> {
+                redo()
+                canvas.invalidate()
             }
             R.id.clearBtn -> {
                 clear()
+            }
+            R.id.saveBtn -> {
+                saveToGallery(this, getBitmapFromView(canvas), "Paint Buddy")
             }
         }
         return super.onOptionsItemSelected(item)
@@ -139,5 +161,51 @@ class MainActivity : AppCompatActivity() {
                 currentAlpha = alphaSlider.progress
             }
         }
+    }
+
+
+    private fun getBitmapFromView(view: CanvasView): Bitmap{
+        val bitmap = createBitmap(view.width, view.height, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+        canvas.drawColor(Color.WHITE);
+        view.draw(canvas)
+        return bitmap
+    }
+
+    fun saveToGallery(context: Context, bitmap: Bitmap, albumName: String) {
+        val filename = "${System.currentTimeMillis()}.png"
+        val write: (OutputStream) -> Boolean = {
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, it)
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            val contentValues = ContentValues().apply {
+                put(MediaStore.MediaColumns.DISPLAY_NAME, filename)
+                put(MediaStore.MediaColumns.MIME_TYPE, "image/png")
+                put(
+                    MediaStore.MediaColumns.RELATIVE_PATH,
+                    "${Environment.DIRECTORY_DCIM}/$albumName"
+                )
+            }
+
+            context.contentResolver.let {
+                it.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)?.let { uri ->
+                    it.openOutputStream(uri)?.let(write)
+                }
+            }
+        } else {
+            val imagesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).toString() + File.separator + albumName
+            val file = File(imagesDir)
+            if (!file.exists()) {
+                file.mkdir()
+            }
+            val image = File(imagesDir, filename)
+            write(FileOutputStream(image))
+        }
+
+        Handler().postDelayed({
+            Toast.makeText(this, "Image saved at: DCIM/$albumName", Toast.LENGTH_LONG).show()
+        }, 150)
+
     }
 }

@@ -5,14 +5,26 @@
 
     <item
         android:id="@+id/undoBtn"
-        android:icon="@android:drawable/ic_menu_revert"
+        android:icon="@drawable/ic_baseline_undo_24"
         android:title="undo"
         app:showAsAction="ifRoom" />
 
     <item
+        android:id="@+id/redoBtn"
+        android:icon="@drawable/ic_baseline_redo_24"
+        android:title="redo"
+        app:showAsAction="ifRoom"/>
+
+    <item
         android:id="@+id/clearBtn"
-        android:icon="@android:drawable/ic_menu_delete"
-        android:title="Erase"
+        android:icon="@drawable/ic_baseline_autorenew_24"
+        android:title="New Page"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/saveBtn"
+        android:icon="@drawable/ic_baseline_save_24"
+        android:title="Save"
         app:showAsAction="ifRoom" />
 
 </menu>

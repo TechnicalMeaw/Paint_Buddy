@@ -29,22 +29,28 @@ public class CanvasView extends View {
     static int currentAlpha = 255;
     static float currentStrock = 5f;
     public static Boolean erase = false;
-    public static Bitmap bitmap;
+
+    //For redo buffer
+    public static ArrayList<Path> pathBufferList = new ArrayList<>();
+    public static ArrayList<Paint> brushBufferList = new ArrayList<>();
 
 
     public CanvasView(Context context) {
         super(context);
+        this.setDrawingCacheEnabled(true);
         init();
 
     }
 
     public CanvasView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
+        this.setDrawingCacheEnabled(true);
         init();
     }
 
     public CanvasView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        this.setDrawingCacheEnabled(true);
         init();
     }
 
@@ -70,6 +76,8 @@ public class CanvasView extends View {
         switch (event.getAction()){
             case MotionEvent.ACTION_DOWN:
                 flag = true;
+                pathBufferList.clear();
+                brushBufferList.clear();
                 path.moveTo(posX, posY);
                 invalidate();
                 return true;
@@ -121,14 +129,29 @@ public class CanvasView extends View {
 
     public static void undo(){
         if(!pathList.isEmpty() || !brushList.isEmpty()){
-            pathList.remove(pathList.size() -1);
-            brushList.remove(brushList.size() -1);
+
+            pathBufferList.add(pathList.remove(pathList.size() -1));
+            brushBufferList.add(brushList.remove(brushList.size() -1));
+
+        }
+    }
+
+    public static void redo(){
+        if (!pathBufferList.isEmpty() || !brushBufferList.isEmpty()){
+
+            pathList.add(pathBufferList.remove(pathBufferList.size()-1));
+            brushList.add(brushBufferList.remove(brushBufferList.size() - 1));
+
         }
     }
 
     public static void clear(){
         pathList.clear();
         brushList.clear();
+    }
+
+    public Bitmap get(){
+        return this.getDrawingCache();
     }
 
 }
