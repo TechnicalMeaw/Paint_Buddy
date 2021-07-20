@@ -4,18 +4,6 @@
 
 
     <item
-        android:id="@+id/undoBtn"
-        android:icon="@drawable/ic_baseline_undo_24"
-        android:title="undo"
-        app:showAsAction="ifRoom" />
-
-    <item
-        android:id="@+id/redoBtn"
-        android:icon="@drawable/ic_baseline_redo_24"
-        android:title="redo"
-        app:showAsAction="ifRoom"/>
-
-    <item
         android:id="@+id/clearBtn"
         android:icon="@drawable/ic_baseline_autorenew_24"
         android:title="New Page"
@@ -26,5 +14,20 @@
         android:icon="@drawable/ic_baseline_save_24"
         android:title="Save"
         app:showAsAction="ifRoom" />
+
+
+    <item
+        android:id="@+id/undoBtn"
+        android:icon="@drawable/ic_baseline_undo_24"
+        android:title="Undo"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/redoBtn"
+        android:icon="@drawable/ic_baseline_redo_24"
+        android:title="Redo"
+        app:showAsAction="ifRoom"/>
+
+
 
 </menu>

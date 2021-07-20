@@ -14,7 +14,10 @@ import android.provider.MediaStore
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.view.MotionEvent
 import android.view.View
+import android.view.View.OnTouchListener
+import android.widget.LinearLayout
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.Toast
@@ -29,6 +32,17 @@ import java.io.OutputStream
 
 class MainActivity : AppCompatActivity() {
 
+//    companion object{
+//        var slider: LinearLayout? = null
+//        var bgColor: LinearLayout? = null
+//        fun hide(){
+//            slider?.visibility = View.GONE
+//            bgColor?.visibility = View.GONE
+//        }
+//    }
+
+
+
     private lateinit var paint: CanvasView
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,9 +50,9 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         paint = CanvasView(this)
-        curColor.backgroundTintList = ContextCompat.getColorStateList(this, R.color.black)
 
-        alphaSlider.setOnSeekBarChangeListener(object : OnSeekBarChangeListener{
+
+        alphaSlider.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 currentAlpha = progress
                 alphaSliderText.text = progress.toString()
@@ -53,7 +67,7 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        sizeSlider.setOnSeekBarChangeListener(object : OnSeekBarChangeListener{
+        sizeSlider.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 currentStrock = progress.toFloat()
                 sizeSliderText.text = progress.toString()
@@ -69,9 +83,35 @@ class MainActivity : AppCompatActivity() {
         })
 
 
+        undoToolBtn.setOnClickListener {
+            undo()
+            canvas.invalidate()
+        }
+        redoToolBtn.setOnClickListener{
+            redo()
+            canvas.invalidate()
+        }
+
+        backgroundToolBtn.setOnClickListener{
+            when (backgroundColorPane.visibility) {
+                View.VISIBLE -> backgroundColorPane.visibility = View.GONE
+                else -> {
+                    sliderWindow.visibility = View.GONE
+                    backgroundColorPane.visibility = View.VISIBLE
+                }
+            }
+        }
+        backgroundToolBtn.backgroundTintList = ContextCompat.getColorStateList(this, R.color.eraser)
 
 
+//        slider = findViewById<LinearLayout>(R.id.sliderWindow)
+//        bgColor = findViewById(R.id.backgroundColorPane)
     }
+
+
+
+
+
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.main_menu, menu)
@@ -102,64 +142,61 @@ class MainActivity : AppCompatActivity() {
     fun Black(view: View) {
         changeBrush(true)
 
-        CanvasView.currentColor = Color.BLACK
-        curColor.backgroundTintList = ContextCompat.getColorStateList(this, R.color.black)
+        currentColor = Color.BLACK
+        brushToolBtn.backgroundTintList = ContextCompat.getColorStateList(this, R.color.black)
         erase = false
     }
     fun Blue(view: View) {
         changeBrush(true)
 
-        CanvasView.currentColor = Color.parseColor("#0099CC")
-        curColor.backgroundTintList = ContextCompat.getColorStateList(this, R.color.blue)
+        currentColor = Color.parseColor("#0099CC")
+        brushToolBtn.backgroundTintList = ContextCompat.getColorStateList(this, R.color.blue)
         erase = false
     }
     fun Green(view: View) {
         changeBrush(true)
 
-        CanvasView.currentColor = Color.parseColor("#669900")
-        curColor.backgroundTintList = ContextCompat.getColorStateList(this, R.color.green)
+        currentColor = Color.parseColor("#669900")
+        brushToolBtn.backgroundTintList = ContextCompat.getColorStateList(this, R.color.green)
         erase = false
     }
     fun Red(view: View) {
         changeBrush(true)
 
-        CanvasView.currentColor = Color.parseColor("#FF4444")
-        curColor.backgroundTintList = ContextCompat.getColorStateList(this, R.color.red)
+        currentColor = Color.parseColor("#FF4444")
+        brushToolBtn.backgroundTintList = ContextCompat.getColorStateList(this, R.color.red)
         erase = false
     }
     fun Purple(view: View) {
         changeBrush(true)
 
-        CanvasView.currentColor = Color.parseColor("#AA66CC")
-        curColor.backgroundTintList = ContextCompat.getColorStateList(this, R.color.purple)
+        currentColor = Color.parseColor("#AA66CC")
+        brushToolBtn.backgroundTintList = ContextCompat.getColorStateList(this, R.color.purple)
         erase = false
     }
     fun Yellow(view: View) {
         changeBrush(true)
 
-        CanvasView.currentColor = Color.parseColor("#FFBB33")
-        curColor.backgroundTintList = ContextCompat.getColorStateList(this, R.color.yellow)
+        currentColor = Color.parseColor("#FFBB33")
+        brushToolBtn.backgroundTintList = ContextCompat.getColorStateList(this, R.color.yellow)
         erase = false
     }
 
     fun erase(view: View) {
         changeBrush(true)
 
-        currentColor = Color.parseColor("#FAFAFA")
-        curColor.backgroundTintList = ContextCompat.getColorStateList(this, R.color.eraser)
+        currentColor = Color.parseColor("#FFFFFF")
+        brushToolBtn.backgroundTintList = ContextCompat.getColorStateList(this, R.color.eraser)
         erase = true
     }
 
     fun configBrush(view: View) {
-        if (sliderWindow.visibility == View.GONE)
+        if (sliderWindow.visibility == View.GONE){
+            backgroundColorPane.visibility = View.GONE
             sliderWindow.visibility = View.VISIBLE
+        }
         else {
             sliderWindow.visibility = View.GONE
-
-            if (currentAlpha != alphaSlider.progress) {
-                changeBrush(true)
-                currentAlpha = alphaSlider.progress
-            }
         }
     }
 
@@ -167,7 +204,7 @@ class MainActivity : AppCompatActivity() {
     private fun getBitmapFromView(view: CanvasView): Bitmap{
         val bitmap = createBitmap(view.width, view.height, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
-        canvas.drawColor(Color.WHITE);
+//        canvas.drawColor(Color.WHITE);
         view.draw(canvas)
         return bitmap
     }
@@ -207,5 +244,48 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this, "Image saved at: DCIM/$albumName", Toast.LENGTH_LONG).show()
         }, 150)
 
+    }
+
+    fun BgBlack(view: View) {
+        backgroundColor = Color.BLACK
+        backgroundToolBtn.backgroundTintList = ContextCompat.getColorStateList(this, R.color.black)
+        canvas.invalidate()
+    }
+    fun BgBlue(view: View) {
+        backgroundColor = Color.parseColor("#0099CC")
+        backgroundToolBtn.backgroundTintList = ContextCompat.getColorStateList(this, R.color.blue)
+        canvas.invalidate()
+    }
+    fun BgGreen(view: View) {
+        backgroundColor = Color.parseColor("#669900")
+        backgroundToolBtn.backgroundTintList = ContextCompat.getColorStateList(this, R.color.green)
+        canvas.invalidate()
+    }
+    fun BgRed(view: View) {
+        backgroundColor = Color.parseColor("#FF4444")
+        backgroundToolBtn.backgroundTintList = ContextCompat.getColorStateList(this, R.color.red)
+        canvas.invalidate()
+    }
+    fun BgPurple(view: View) {
+        backgroundColor = Color.parseColor("#AA66CC")
+        backgroundToolBtn.backgroundTintList = ContextCompat.getColorStateList(this, R.color.purple)
+        canvas.invalidate()
+    }
+    fun BgYellow(view: View) {
+        backgroundColor = Color.parseColor("#FFBB33")
+        backgroundToolBtn.backgroundTintList = ContextCompat.getColorStateList(this, R.color.yellow)
+        canvas.invalidate()
+    }
+
+    fun BgWhite(view: View) {
+        backgroundColor = Color.WHITE
+        backgroundToolBtn.backgroundTintList = ContextCompat.getColorStateList(this, R.color.eraser)
+        canvas.invalidate()
+    }
+
+    fun BgGray(view: View) {
+        backgroundColor = Color.GRAY
+        backgroundToolBtn.backgroundTintList = ContextCompat.getColorStateList(this, R.color.gray)
+        canvas.invalidate()
     }
 }

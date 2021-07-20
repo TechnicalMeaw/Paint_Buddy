@@ -1,13 +1,12 @@
 package com.example.paintbuddy;
 
 import android.content.Context;
-import android.graphics.Bitmap;
+
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
+
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -29,6 +28,7 @@ public class CanvasView extends View {
     static int currentAlpha = 255;
     static float currentStrock = 5f;
     public static Boolean erase = false;
+    public static int backgroundColor = Color.WHITE;
 
     //For redo buffer
     public static ArrayList<Path> pathBufferList = new ArrayList<>();
@@ -104,6 +104,7 @@ public class CanvasView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
 
+        canvas.drawColor(backgroundColor);
         Iterator<Path> it1 = pathList.iterator();
         Iterator<Paint> it2 = brushList.iterator();
 
@@ -150,8 +151,6 @@ public class CanvasView extends View {
         brushList.clear();
     }
 
-    public Bitmap get(){
-        return this.getDrawingCache();
-    }
+
 
 }
