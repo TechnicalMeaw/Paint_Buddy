@@ -249,43 +249,51 @@ class MainActivity : AppCompatActivity() {
     fun BgBlack(view: View) {
         backgroundColor = Color.BLACK
         backgroundToolBtn.backgroundTintList = ContextCompat.getColorStateList(this, R.color.black)
+        backgroundExtraSpace.background = getDrawable(R.color.black)
         canvas.invalidate()
     }
     fun BgBlue(view: View) {
         backgroundColor = Color.parseColor("#0099CC")
         backgroundToolBtn.backgroundTintList = ContextCompat.getColorStateList(this, R.color.blue)
+        backgroundExtraSpace.background = getDrawable(R.color.blue)
         canvas.invalidate()
     }
     fun BgGreen(view: View) {
         backgroundColor = Color.parseColor("#669900")
         backgroundToolBtn.backgroundTintList = ContextCompat.getColorStateList(this, R.color.green)
+        backgroundExtraSpace.background = getDrawable(R.color.green)
         canvas.invalidate()
     }
     fun BgRed(view: View) {
         backgroundColor = Color.parseColor("#FF4444")
         backgroundToolBtn.backgroundTintList = ContextCompat.getColorStateList(this, R.color.red)
+        backgroundExtraSpace.background = getDrawable(R.color.red)
         canvas.invalidate()
     }
     fun BgPurple(view: View) {
         backgroundColor = Color.parseColor("#AA66CC")
         backgroundToolBtn.backgroundTintList = ContextCompat.getColorStateList(this, R.color.purple)
+        backgroundExtraSpace.background = getDrawable(R.color.purple)
         canvas.invalidate()
     }
     fun BgYellow(view: View) {
         backgroundColor = Color.parseColor("#FFBB33")
         backgroundToolBtn.backgroundTintList = ContextCompat.getColorStateList(this, R.color.yellow)
+        backgroundExtraSpace.background = getDrawable(R.color.yellow)
         canvas.invalidate()
     }
 
     fun BgWhite(view: View) {
         backgroundColor = Color.WHITE
         backgroundToolBtn.backgroundTintList = ContextCompat.getColorStateList(this, R.color.eraser)
+        backgroundExtraSpace.background = getDrawable(R.color.eraser)
         canvas.invalidate()
     }
 
     fun BgGray(view: View) {
         backgroundColor = Color.GRAY
         backgroundToolBtn.backgroundTintList = ContextCompat.getColorStateList(this, R.color.gray)
+        backgroundExtraSpace.background = getDrawable(R.color.gray)
         canvas.invalidate()
     }
 }

@@ -13,6 +13,13 @@
         />
 
 
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/backgroundExtraSpace"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_below="@id/canvas"
+        android:background="@color/eraser"/>
 
     <LinearLayout
         android:id="@+id/sliderWindow"
