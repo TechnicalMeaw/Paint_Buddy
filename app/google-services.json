@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "13964368548",
+    "firebase_url": "https://paint-buddy-321e9-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "paint-buddy-321e9",
+    "storage_bucket": "paint-buddy-321e9.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:13964368548:android:cde7c768bc738dc5eae431",
+        "android_client_info": {
+          "package_name": "com.example.paintbuddy"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "13964368548-fcg17mtu0ngj2cndqfqon8u97c1g26ar.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.paintbuddy",
+            "certificate_hash": "2b7546248d2216b5cb713bbb0558b1c1dabcd07b"
+          }
+        },
+        {
+          "client_id": "13964368548-tcjmrhujspj7882gtif5lt4b35p9utg2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC9Kk8NVTTshsmcF8Fpual2XRs4ElzQilE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "13964368548-tcjmrhujspj7882gtif5lt4b35p9utg2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

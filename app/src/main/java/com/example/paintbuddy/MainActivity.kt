@@ -24,10 +24,13 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.example.paintbuddy.CanvasView.*
+import com.google.firebase.database.FirebaseDatabase
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStream
+import java.util.*
+import kotlin.concurrent.timerTask
 
 
 class MainActivity : AppCompatActivity() {
@@ -106,10 +109,24 @@ class MainActivity : AppCompatActivity() {
 
 //        slider = findViewById<LinearLayout>(R.id.sliderWindow)
 //        bgColor = findViewById(R.id.backgroundColorPane)
+        update()
     }
 
 
+    private fun update(){
+        var pl = pathList.size
+        var bgColor = backgroundColor
+        Timer().scheduleAtFixedRate(timerTask {
+            if ((pathList.size != pl || backgroundColor != bgColor) && pathList.size > 0){
+                UpdateOperations.getCurrentValue()
+                UploadBitmap.uploadImageToFirebase(getBitmapFromView(canvas))
+                Log.d("MainActivity", "Updated Drawing :: Success")
+                pl = pathList.size
+                bgColor = backgroundColor
+            }
+        },2000,3500)
 
+    }
 
 
 
