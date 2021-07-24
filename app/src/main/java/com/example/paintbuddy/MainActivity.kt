@@ -22,29 +22,21 @@ import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import com.example.paintbuddy.CanvasView.*
+import com.example.paintbuddy.UpdateOperations.Companion.bgColor
 import com.google.firebase.database.FirebaseDatabase
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStream
 import java.util.*
+import kotlin.concurrent.scheduleAtFixedRate
 import kotlin.concurrent.timerTask
 
 
 class MainActivity : AppCompatActivity() {
-
-//    companion object{
-//        var slider: LinearLayout? = null
-//        var bgColor: LinearLayout? = null
-//        fun hide(){
-//            slider?.visibility = View.GONE
-//            bgColor?.visibility = View.GONE
-//        }
-//    }
-
-
 
     private lateinit var paint: CanvasView
 
@@ -104,7 +96,8 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-        backgroundToolBtn.backgroundTintList = ContextCompat.getColorStateList(this, R.color.eraser)
+        backgroundToolBtn.backgroundTintList = ContextCompat.getColorStateList(this, R.color.black)
+        backgroundExtraSpace.background = AppCompatResources.getDrawable(applicationContext, bgColor)
 
 
 //        slider = findViewById<LinearLayout>(R.id.sliderWindow)
@@ -116,15 +109,16 @@ class MainActivity : AppCompatActivity() {
     private fun update(){
         var pl = pathList.size
         var bgColor = backgroundColor
-        Timer().scheduleAtFixedRate(timerTask {
-            if ((pathList.size != pl || backgroundColor != bgColor) && pathList.size > 0){
-                UpdateOperations.getCurrentValue()
-                UploadBitmap.uploadImageToFirebase(getBitmapFromView(canvas))
+        Timer().scheduleAtFixedRate(
+            timerTask {
+            if ((pathList.size != pl || backgroundColor != bgColor) && flag == false){
+
+                UploadBitmap.uploadImageToFirebase(getBitmapFromView(canvas, false))
                 Log.d("MainActivity", "Updated Drawing :: Success")
                 pl = pathList.size
                 bgColor = backgroundColor
             }
-        },2000,3500)
+        }, 2000, 900)
 
     }
 
@@ -148,9 +142,10 @@ class MainActivity : AppCompatActivity() {
             }
             R.id.clearBtn -> {
                 clear()
+                canvas.invalidate()
             }
             R.id.saveBtn -> {
-                saveToGallery(this, getBitmapFromView(canvas), "Paint Buddy")
+                saveToGallery(this, getBitmapFromView(canvas, true), "Paint Buddy")
             }
         }
         return super.onOptionsItemSelected(item)
@@ -218,15 +213,16 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    private fun getBitmapFromView(view: CanvasView): Bitmap{
+    private fun getBitmapFromView(view: CanvasView, isSaving: Boolean): Bitmap{
         val bitmap = createBitmap(view.width, view.height, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
-//        canvas.drawColor(Color.WHITE);
+        if (isSaving)
+            canvas.drawColor(backgroundColor)
         view.draw(canvas)
         return bitmap
     }
 
-    fun saveToGallery(context: Context, bitmap: Bitmap, albumName: String) {
+    private fun saveToGallery(context: Context, bitmap: Bitmap, albumName: String) {
         val filename = "${System.currentTimeMillis()}.png"
         val write: (OutputStream) -> Boolean = {
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, it)
@@ -265,52 +261,44 @@ class MainActivity : AppCompatActivity() {
 
     fun BgBlack(view: View) {
         backgroundColor = Color.BLACK
-        backgroundToolBtn.backgroundTintList = ContextCompat.getColorStateList(this, R.color.black)
-        backgroundExtraSpace.background = getDrawable(R.color.black)
-        canvas.invalidate()
+        changeBgColor(R.color.black)
     }
     fun BgBlue(view: View) {
         backgroundColor = Color.parseColor("#0099CC")
-        backgroundToolBtn.backgroundTintList = ContextCompat.getColorStateList(this, R.color.blue)
-        backgroundExtraSpace.background = getDrawable(R.color.blue)
-        canvas.invalidate()
+        changeBgColor(R.color.blue)
     }
     fun BgGreen(view: View) {
         backgroundColor = Color.parseColor("#669900")
-        backgroundToolBtn.backgroundTintList = ContextCompat.getColorStateList(this, R.color.green)
-        backgroundExtraSpace.background = getDrawable(R.color.green)
-        canvas.invalidate()
+        changeBgColor(R.color.green)
     }
     fun BgRed(view: View) {
         backgroundColor = Color.parseColor("#FF4444")
-        backgroundToolBtn.backgroundTintList = ContextCompat.getColorStateList(this, R.color.red)
-        backgroundExtraSpace.background = getDrawable(R.color.red)
-        canvas.invalidate()
+        changeBgColor(R.color.red)
     }
     fun BgPurple(view: View) {
         backgroundColor = Color.parseColor("#AA66CC")
-        backgroundToolBtn.backgroundTintList = ContextCompat.getColorStateList(this, R.color.purple)
-        backgroundExtraSpace.background = getDrawable(R.color.purple)
-        canvas.invalidate()
+        changeBgColor(R.color.purple)
     }
     fun BgYellow(view: View) {
         backgroundColor = Color.parseColor("#FFBB33")
-        backgroundToolBtn.backgroundTintList = ContextCompat.getColorStateList(this, R.color.yellow)
-        backgroundExtraSpace.background = getDrawable(R.color.yellow)
-        canvas.invalidate()
+        changeBgColor(R.color.yellow)
     }
 
     fun BgWhite(view: View) {
         backgroundColor = Color.WHITE
-        backgroundToolBtn.backgroundTintList = ContextCompat.getColorStateList(this, R.color.eraser)
-        backgroundExtraSpace.background = getDrawable(R.color.eraser)
-        canvas.invalidate()
+        changeBgColor(R.color.eraser)
     }
 
     fun BgGray(view: View) {
         backgroundColor = Color.GRAY
-        backgroundToolBtn.backgroundTintList = ContextCompat.getColorStateList(this, R.color.gray)
-        backgroundExtraSpace.background = getDrawable(R.color.gray)
-        canvas.invalidate()
+        changeBgColor(R.color.gray)
+
+        println(R.color.gray.toString())
+    }
+
+    private fun changeBgColor(color: Int){
+        bgColor = color
+        backgroundToolBtn.backgroundTintList = ContextCompat.getColorStateList(this, color)
+        backgroundExtraSpace.background = AppCompatResources.getDrawable(applicationContext, color)
     }
 }

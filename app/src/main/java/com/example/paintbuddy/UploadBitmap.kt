@@ -5,6 +5,7 @@ import android.util.Log
 import com.google.firebase.storage.FirebaseStorage
 import java.io.ByteArrayOutputStream
 import java.util.*
+import android.util.Base64;
 
 class UploadBitmap {
 
@@ -12,23 +13,28 @@ class UploadBitmap {
         private const val TAG = "UploadOperations"
 
         fun uploadImageToFirebase(bitmap: Bitmap){
-            val filename = UUID.randomUUID().toString()
-            val ref = FirebaseStorage.getInstance().getReference("images/$filename")
+            UpdateOperations.updateDrawing(convertToBase64String(bitmap))
 
-            ref.putBytes(bitmapToByteArray(bitmap)).addOnSuccessListener {
-                Log.d(TAG, "Bitmap Successfully Uploaded" )
-
-                ref.downloadUrl.addOnSuccessListener{
-                    UpdateOperations.updateDrawing(it.toString())
-                }
-            }
         }
 
         private fun bitmapToByteArray(bitmap: Bitmap): ByteArray {
+            val reducedBitmap = ImageResizer.reduceBitmapSize(bitmap, 250000)
+            reducedBitmap.setHasAlpha(true)
             val stream = ByteArrayOutputStream()
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 70, stream)
+
+            reducedBitmap.compress(Bitmap.CompressFormat.PNG, 60, stream)
 
             return stream.toByteArray()
+        }
+
+        private fun compressByteArray(byteArray: ByteArray): ByteArray {
+            return Compressor.compress(byteArray)
+        }
+
+        private fun convertToBase64String(bitmap: Bitmap): String {
+            val byteImage = compressByteArray(bitmapToByteArray(bitmap))
+
+            return Base64.encodeToString(byteImage, Base64.DEFAULT)
         }
     }
 }

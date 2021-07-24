@@ -1,13 +1,12 @@
 package com.example.paintbuddy;
 
 import android.content.Context;
-
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
-
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +15,7 @@ import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 public class CanvasView extends View {
 
@@ -33,6 +33,8 @@ public class CanvasView extends View {
     //For redo buffer
     public static ArrayList<Path> pathBufferList = new ArrayList<>();
     public static ArrayList<Paint> brushBufferList = new ArrayList<>();
+
+    private List<String> stringPaths = new ArrayList<String>();
 
 
     public CanvasView(Context context) {
@@ -104,18 +106,35 @@ public class CanvasView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
 
-        canvas.drawColor(backgroundColor);
+//        canvas.drawColor(backgroundColor);
+
         Iterator<Path> it1 = pathList.iterator();
         Iterator<Paint> it2 = brushList.iterator();
 
         while (it1.hasNext() && it2.hasNext()) {
-            canvas.drawPath(it1.next(), it2.next());
+            try {
+                canvas.drawPath(it1.next(), it2.next());
+            }catch (Exception e){
+                Log.e("CanvasView", "Error! ::" + e);
+            }
+
 //            canvas.setBitmap(bitmap);
-            invalidate();
+//            invalidate();
         }
 
         if (flag)
             canvas.drawPath(path, brush);
+
+        // Convert Path List to String List
+        stringPaths.clear();
+        for(Path path : pathList)
+        {
+            stringPaths.add(String.valueOf(path));
+        }
+
+//        for (String string : stringPaths){
+//            pathList.add()
+//        }
     }
 
     public static void changeBrush(Boolean changedBrush){

@@ -7,21 +7,21 @@
     tools:context=".MainActivity"
     android:background="#FFFFFF">
 
-    <com.example.paintbuddy.CanvasView
-        android:id="@+id/canvas"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@id/toolDoc"
-        />
-
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/backgroundExtraSpace"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_below="@id/canvas"
+        android:layout_alignParentTop="true"
         android:background="@color/eraser"/>
+
+    <com.example.paintbuddy.CanvasView
+        android:id="@+id/canvas"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/toolDoc"
+        />
 
 
     <LinearLayout
