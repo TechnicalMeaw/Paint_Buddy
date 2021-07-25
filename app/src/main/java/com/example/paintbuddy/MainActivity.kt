@@ -14,10 +14,7 @@ import android.provider.MediaStore
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import android.view.MotionEvent
 import android.view.View
-import android.view.View.OnTouchListener
-import android.widget.LinearLayout
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.Toast
@@ -26,13 +23,11 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import com.example.paintbuddy.CanvasView.*
 import com.example.paintbuddy.UpdateOperations.Companion.bgColor
-import com.google.firebase.database.FirebaseDatabase
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStream
 import java.util.*
-import kotlin.concurrent.scheduleAtFixedRate
 import kotlin.concurrent.timerTask
 
 

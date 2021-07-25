@@ -1,14 +1,11 @@
 package com.example.paintbuddy
 
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.Canvas
-import android.graphics.Color
 import android.os.Bundle
-import android.util.Base64
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
+import com.example.paintbuddy.StringConversions.Companion.convertToByteArray
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -47,7 +44,7 @@ class ViewDrawingActivity : AppCompatActivity() {
 
     fun showImage(){
 
-        val imageBytes = Compressor.decompress(Base64.decode(imageItem?.bitmapUri, Base64.DEFAULT))
+        val imageBytes = convertToByteArray(imageItem!!.bitmapUri)
         val decodedImage = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
 
 

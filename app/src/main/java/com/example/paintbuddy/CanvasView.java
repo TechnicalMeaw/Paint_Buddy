@@ -20,9 +20,9 @@ import java.util.List;
 public class CanvasView extends View {
 
     public ViewGroup.LayoutParams params;
-    public static ArrayList<Path> pathList = new ArrayList<>();
+    public static ArrayList<CustomPath> pathList = new ArrayList<>();
     public static ArrayList<Paint> brushList = new ArrayList<>();
-    public static Path path = new Path();
+    public static CustomPath path = new CustomPath();
     public static Paint brush = new Paint();
     public static int currentColor = Color.BLACK;
     static int currentAlpha = 255;
@@ -31,7 +31,7 @@ public class CanvasView extends View {
     public static int backgroundColor = Color.WHITE;
 
     //For redo buffer
-    public static ArrayList<Path> pathBufferList = new ArrayList<>();
+    public static ArrayList<CustomPath> pathBufferList = new ArrayList<>();
     public static ArrayList<Paint> brushBufferList = new ArrayList<>();
 
     private List<String> stringPaths = new ArrayList<String>();
@@ -108,7 +108,7 @@ public class CanvasView extends View {
 
 //        canvas.drawColor(backgroundColor);
 
-        Iterator<Path> it1 = pathList.iterator();
+        Iterator<CustomPath> it1 = pathList.iterator();
         Iterator<Paint> it2 = brushList.iterator();
 
         while (it1.hasNext() && it2.hasNext()) {
@@ -143,7 +143,7 @@ public class CanvasView extends View {
             brushList.add(brush);
         }
         brush = new Paint();
-        path = new Path();
+        path = new CustomPath();
     }
 
 
