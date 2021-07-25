@@ -25,6 +25,12 @@
             android:layout_height="wrap_content"
             android:text="View"/>
 
+        <Button
+            android:id="@+id/viewCanvasBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="View In Canvas"/>
+
     </LinearLayout>
 
 </RelativeLayout>

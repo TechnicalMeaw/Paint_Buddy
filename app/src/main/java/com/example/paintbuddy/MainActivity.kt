@@ -23,6 +23,8 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import com.example.paintbuddy.CanvasView.*
 import com.example.paintbuddy.UpdateOperations.Companion.bgColor
+import com.example.paintbuddy.UploadDrawingInfo.Companion.updateBrushINfoToFirebase
+import com.example.paintbuddy.UploadDrawingInfo.Companion.updatePathInfoToFirebase
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.File
 import java.io.FileOutputStream
@@ -59,7 +61,7 @@ class MainActivity : AppCompatActivity() {
 
         sizeSlider.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                currentStrock = progress.toFloat()
+                currentStroke = progress.toFloat()
                 sizeSliderText.text = progress.toString()
             }
 
@@ -112,6 +114,14 @@ class MainActivity : AppCompatActivity() {
                 Log.d("MainActivity", "Updated Drawing :: Success")
                 pl = pathList.size
                 bgColor = backgroundColor
+
+                try {
+                    updatePathInfoToFirebase(pathList)
+                    updateBrushINfoToFirebase(brushList)
+                }catch (e : Exception){
+                    Log.e("MainActivity","$e")
+                }
+
             }
         }, 2000, 900)
 

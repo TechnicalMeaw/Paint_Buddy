@@ -19,5 +19,10 @@ class MainMenuActivity : AppCompatActivity() {
             val intent = Intent(this, ViewDrawingActivity::class.java)
             startActivity(intent)
         }
+
+        viewCanvasBtn.setOnClickListener {
+            val intent = Intent(this, ViewDrawingInCanvas::class.java)
+            startActivity(intent)
+        }
     }
 }

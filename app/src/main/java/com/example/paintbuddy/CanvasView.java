@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Path;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -15,26 +14,25 @@ import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
 public class CanvasView extends View {
 
     public ViewGroup.LayoutParams params;
     public static ArrayList<CustomPath> pathList = new ArrayList<>();
-    public static ArrayList<Paint> brushList = new ArrayList<>();
+    public static ArrayList<CustomPaint> brushList = new ArrayList<>();
     public static CustomPath path = new CustomPath();
-    public static Paint brush = new Paint();
+    public static CustomPaint brush = new CustomPaint();
     public static int currentColor = Color.BLACK;
     static int currentAlpha = 255;
-    static float currentStrock = 5f;
+    static float currentStroke = 5f;
     public static Boolean erase = false;
     public static int backgroundColor = Color.WHITE;
 
     //For redo buffer
     public static ArrayList<CustomPath> pathBufferList = new ArrayList<>();
-    public static ArrayList<Paint> brushBufferList = new ArrayList<>();
+    public static ArrayList<CustomPaint> brushBufferList = new ArrayList<>();
 
-    private List<String> stringPaths = new ArrayList<String>();
+//    private List<String> stringPaths = new ArrayList<String>();
 
 
     public CanvasView(Context context) {
@@ -61,7 +59,7 @@ public class CanvasView extends View {
         brush.setAntiAlias(true);
         brush.setStyle(Paint.Style.STROKE);
         brush.setStrokeJoin(Paint.Join.ROUND);
-        brush.setStrokeWidth(currentStrock);
+        brush.setStrokeWidth(currentStroke);
         brush.setColor(currentColor);
         brush.setAlpha(currentAlpha);
         invalidate();
@@ -109,7 +107,7 @@ public class CanvasView extends View {
 //        canvas.drawColor(backgroundColor);
 
         Iterator<CustomPath> it1 = pathList.iterator();
-        Iterator<Paint> it2 = brushList.iterator();
+        Iterator<CustomPaint> it2 = brushList.iterator();
 
         while (it1.hasNext() && it2.hasNext()) {
             try {
@@ -126,11 +124,11 @@ public class CanvasView extends View {
             canvas.drawPath(path, brush);
 
         // Convert Path List to String List
-        stringPaths.clear();
-        for(Path path : pathList)
-        {
-            stringPaths.add(String.valueOf(path));
-        }
+//        stringPaths.clear();
+//        for(Path path : pathList)
+//        {
+//            stringPaths.add(String.valueOf(path));
+//        }
 
 //        for (String string : stringPaths){
 //            pathList.add()
@@ -142,7 +140,7 @@ public class CanvasView extends View {
             pathList.add(path);
             brushList.add(brush);
         }
-        brush = new Paint();
+        brush = new CustomPaint();
         path = new CustomPath();
     }
 

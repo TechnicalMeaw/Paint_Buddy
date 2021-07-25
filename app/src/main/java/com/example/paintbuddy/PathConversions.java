@@ -1,5 +1,7 @@
 package com.example.paintbuddy;
 
+import android.graphics.Paint;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -13,8 +15,7 @@ public class PathConversions {
         ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
         objectOutputStream.writeObject(customPath);
         objectOutputStream.close();
-        byte[] array = outputStream.toByteArray();
-        return array;
+        return outputStream.toByteArray();
     }
 
     public static CustomPath decodeToCustomPath(byte[] data) throws IOException, ClassNotFoundException {
@@ -23,7 +24,24 @@ public class PathConversions {
         CustomPath recover =(CustomPath) in.readObject();
         in.close();
         return recover;
+    }
 
+    public static byte[] encodeToByteArray(CustomPaint paint) throws IOException{
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
+        objectOutputStream.writeObject(paint);
+        objectOutputStream.close();
+        return outputStream.toByteArray();
+    }
+
+
+    public static CustomPaint decodeToCustomPaint(byte[] data) throws IOException, ClassNotFoundException {
+
+        ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(data));
+        CustomPaint recover =(CustomPaint) in.readObject();
+        in.close();
+        return recover;
     }
 
 }

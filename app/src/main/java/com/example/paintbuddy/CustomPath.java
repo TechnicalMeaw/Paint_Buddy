@@ -11,7 +11,7 @@ public class CustomPath extends Path implements Serializable {
 
     private static final long serialVersionUID = -5974912367682897467L;
 
-    private ArrayList<PathAction> actions = new ArrayList<CustomPath.PathAction>();
+    public ArrayList<PathAction> actions = new ArrayList<CustomPath.PathAction>();
 
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException{
         in.defaultReadObject();
