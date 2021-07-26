@@ -23,8 +23,11 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import com.example.paintbuddy.CanvasView.*
 import com.example.paintbuddy.UpdateOperations.Companion.bgColor
-import com.example.paintbuddy.UploadDrawingInfo.Companion.updateBrushINfoToFirebase
-import com.example.paintbuddy.UploadDrawingInfo.Companion.updatePathInfoToFirebase
+import com.example.paintbuddy.UpdateOperations.Companion.updateScreenResolution
+import com.example.paintbuddy.UploadDrawingInfo.Companion.BgColor
+import com.example.paintbuddy.UploadDrawingInfo.Companion.addDrawInfoToFirebase
+import com.example.paintbuddy.UploadDrawingInfo.Companion.color
+import com.example.paintbuddy.UploadDrawingInfo.Companion.drawList
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.File
 import java.io.FileOutputStream
@@ -108,22 +111,26 @@ class MainActivity : AppCompatActivity() {
         var bgColor = backgroundColor
         Timer().scheduleAtFixedRate(
             timerTask {
+
             if ((pathList.size != pl || backgroundColor != bgColor) && flag == false){
 
-                UploadBitmap.uploadImageToFirebase(getBitmapFromView(canvas, false))
-                Log.d("MainActivity", "Updated Drawing :: Success")
-                pl = pathList.size
-                bgColor = backgroundColor
+                if (pathList.size == 1)
+                    updateScreenResolution(canvas.width, canvas.height)
+//                UploadBitmap.uploadImageToFirebase(getBitmapFromView(canvas, false))
 
                 try {
-                    updatePathInfoToFirebase(pathList)
-                    updateBrushINfoToFirebase(brushList)
+                    addDrawInfoToFirebase(pathList, currentStroke, currentAlpha)
+                    Log.d("MainActivity", "Updated Drawing :: Success")
+
                 }catch (e : Exception){
                     Log.e("MainActivity","$e")
                 }
 
+                pl = pathList.size
+                bgColor = backgroundColor
+
             }
-        }, 2000, 900)
+        }, 2000, 150)
 
     }
 
@@ -144,6 +151,7 @@ class MainActivity : AppCompatActivity() {
             R.id.redoBtn -> {
                 redo()
                 canvas.invalidate()
+                addDrawInfoToFirebase(pathList, currentStroke, currentAlpha)
             }
             R.id.clearBtn -> {
                 clear()
@@ -159,6 +167,7 @@ class MainActivity : AppCompatActivity() {
     fun Black(view: View) {
         changeBrush(true)
 
+        color = "#000000"
         currentColor = Color.BLACK
         brushToolBtn.backgroundTintList = ContextCompat.getColorStateList(this, R.color.black)
         erase = false
@@ -166,35 +175,40 @@ class MainActivity : AppCompatActivity() {
     fun Blue(view: View) {
         changeBrush(true)
 
-        currentColor = Color.parseColor("#0099CC")
+        color = "#0099CC"
+        currentColor = Color.parseColor(color)
         brushToolBtn.backgroundTintList = ContextCompat.getColorStateList(this, R.color.blue)
         erase = false
     }
     fun Green(view: View) {
         changeBrush(true)
 
-        currentColor = Color.parseColor("#669900")
+        color = "#669900"
+        currentColor = Color.parseColor(color)
         brushToolBtn.backgroundTintList = ContextCompat.getColorStateList(this, R.color.green)
         erase = false
     }
     fun Red(view: View) {
         changeBrush(true)
 
-        currentColor = Color.parseColor("#FF4444")
+        color = "#FF4444"
+        currentColor = Color.parseColor(color)
         brushToolBtn.backgroundTintList = ContextCompat.getColorStateList(this, R.color.red)
         erase = false
     }
     fun Purple(view: View) {
         changeBrush(true)
 
-        currentColor = Color.parseColor("#AA66CC")
+        color = "#AA66CC"
+        currentColor = Color.parseColor(color)
         brushToolBtn.backgroundTintList = ContextCompat.getColorStateList(this, R.color.purple)
         erase = false
     }
     fun Yellow(view: View) {
         changeBrush(true)
 
-        currentColor = Color.parseColor("#FFBB33")
+        color = "#FFBB33"
+        currentColor = Color.parseColor(color)
         brushToolBtn.backgroundTintList = ContextCompat.getColorStateList(this, R.color.yellow)
         erase = false
     }
@@ -202,7 +216,8 @@ class MainActivity : AppCompatActivity() {
     fun erase(view: View) {
         changeBrush(true)
 
-        currentColor = Color.parseColor("#FFFFFF")
+        color = "#FFFFFF"
+        currentColor = Color.parseColor(color)
         brushToolBtn.backgroundTintList = ContextCompat.getColorStateList(this, R.color.eraser)
         erase = true
     }
@@ -265,36 +280,44 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun BgBlack(view: View) {
+        BgColor = "#000000"
         backgroundColor = Color.BLACK
         changeBgColor(R.color.black)
     }
     fun BgBlue(view: View) {
-        backgroundColor = Color.parseColor("#0099CC")
+        BgColor = "#0099CC"
+        backgroundColor = Color.parseColor(BgColor)
         changeBgColor(R.color.blue)
     }
     fun BgGreen(view: View) {
-        backgroundColor = Color.parseColor("#669900")
+        BgColor = "#669900"
+        backgroundColor = Color.parseColor(BgColor)
         changeBgColor(R.color.green)
     }
     fun BgRed(view: View) {
-        backgroundColor = Color.parseColor("#FF4444")
+        BgColor = "#FF4444"
+        backgroundColor = Color.parseColor(BgColor)
         changeBgColor(R.color.red)
     }
     fun BgPurple(view: View) {
-        backgroundColor = Color.parseColor("#AA66CC")
+        BgColor = "#AA66CC"
+        backgroundColor = Color.parseColor(BgColor)
         changeBgColor(R.color.purple)
     }
     fun BgYellow(view: View) {
-        backgroundColor = Color.parseColor("#FFBB33")
+        BgColor = "#FFBB33"
+        backgroundColor = Color.parseColor(BgColor)
         changeBgColor(R.color.yellow)
     }
 
     fun BgWhite(view: View) {
+        BgColor = "#FFFFFF"
         backgroundColor = Color.WHITE
         changeBgColor(R.color.eraser)
     }
 
     fun BgGray(view: View) {
+        BgColor = "#AAAAAA"
         backgroundColor = Color.GRAY
         changeBgColor(R.color.gray)
 
