@@ -114,12 +114,11 @@ class MainActivity : AppCompatActivity() {
 
             if ((pathList.size != pl || backgroundColor != bgColor) && flag == false){
 
-                if (pathList.size == 1)
-                    updateScreenResolution(canvas.width, canvas.height)
 //                UploadBitmap.uploadImageToFirebase(getBitmapFromView(canvas, false))
 
                 try {
                     addDrawInfoToFirebase(pathList, currentStroke, currentAlpha)
+                    updateScreenResolution(canvas.width, canvas.height)
                     Log.d("MainActivity", "Updated Drawing :: Success")
 
                 }catch (e : Exception){

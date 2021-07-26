@@ -17,8 +17,8 @@ import java.lang.Exception
 class ViewDrawingInCanvas : AppCompatActivity() {
     private val drawRef = FirebaseDatabase.getInstance().getReference("/DrawInfo/")
     private val scrRef = FirebaseDatabase.getInstance().getReference("/ScreenRes/")
-    var width = 1980
-    var height = 1080
+    var width = 1080
+    var height = 1980
 
     var bgColor = "FFFFFF"
 
