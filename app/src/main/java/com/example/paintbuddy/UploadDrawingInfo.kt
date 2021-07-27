@@ -24,8 +24,8 @@ class UploadDrawingInfo {
                     }
                 }
                 lSize < dSize -> {
-                    while (lSize != dSize){
-                        drawList.removeAt(dSize - 1)
+                    while (lSize != drawList.size){
+                        drawList.removeAt(drawList.size - 1)
                         println("List Size Reduced")
                     }
                 }

@@ -96,7 +96,7 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-        backgroundToolBtn.backgroundTintList = ContextCompat.getColorStateList(this, R.color.black)
+        backgroundToolBtn.backgroundTintList = ContextCompat.getColorStateList(this, R.color.eraser)
         backgroundExtraSpace.background = AppCompatResources.getDrawable(applicationContext, bgColor)
 
 
@@ -112,24 +112,26 @@ class MainActivity : AppCompatActivity() {
         Timer().scheduleAtFixedRate(
             timerTask {
 
-            if ((pathList.size != pl || backgroundColor != bgColor) && flag == false){
+                if ((pathList.size != pl || backgroundColor != bgColor) && flag == false){
 
-//                UploadBitmap.uploadImageToFirebase(getBitmapFromView(canvas, false))
+                    try {
+                        sliderWindow.visibility = View.GONE
+                        backgroundColorPane.visibility = View.GONE
 
-                try {
-                    addDrawInfoToFirebase(pathList, currentStroke, currentAlpha)
-                    updateScreenResolution(canvas.width, canvas.height)
-                    Log.d("MainActivity", "Updated Drawing :: Success")
+                        addDrawInfoToFirebase(pathList, currentStroke, currentAlpha)
+                        updateScreenResolution(canvas.width, canvas.height)
+                        Log.d("MainActivity", "Updated Drawing :: Success")
 
-                }catch (e : Exception){
-                    Log.e("MainActivity","$e")
+                    }catch (e : Exception){
+                        Log.e("MainActivity","$e")
+                    }
+
+                    pl = pathList.size
+                    bgColor = backgroundColor
+
                 }
-
-                pl = pathList.size
-                bgColor = backgroundColor
-
-            }
-        }, 2000, 150)
+            }, 2000, 50
+        )
 
     }
 

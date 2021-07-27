@@ -20,13 +20,13 @@ class ViewDrawingInCanvas : AppCompatActivity() {
     var width = 1080
     var height = 1980
 
-    var bgColor = "FFFFFF"
+    var bgColor = "#FFFFFF"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_view_drawing_in_canvas)
 
-        getScreenRes()
+        getScreenRes(viewDrawingCanvas)
         updateCanvas(viewDrawingCanvas)
 
     }
@@ -48,29 +48,55 @@ class ViewDrawingInCanvas : AppCompatActivity() {
     var alphaMap : HashMap<String, Int> = HashMap()
 
     private fun updateCanvas(view: ImageView){
-        getScreenRes()
         drawRef.addChildEventListener(object : ChildEventListener{
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
-                val path = snapshot.child("drawPath").value as String
-                val brushColor = snapshot.child("brushColor").value as String
-                val brushStroke = snapshot.child("brushStroke").value as Long
-                val brushAlpha = snapshot.child("brushAlpha").value as Long
-                bgColor = snapshot.child("bgColor").value as String
+                if (snapshot.value != null) {
+                    getScreenRes(viewDrawingCanvas)
+                    try {
+                        val path = snapshot.child("drawPath").value as String
+                        val brushColor = snapshot.child("brushColor").value as String
+                        val brushStroke = snapshot.child("brushStroke").value as Long
+                        val brushAlpha = snapshot.child("brushAlpha").value as Long
+                        bgColor = snapshot.child("bgColor").value as String
 
 
-                drawMap[snapshot.key.toString()] = convertStringToPath(path)
-                brushColorMap[snapshot.key.toString()] = brushColor
-                strokeMap[snapshot.key.toString()] = brushStroke.toFloat()
-                alphaMap[snapshot.key.toString()] = brushAlpha.toInt()
+                        drawMap[snapshot.key.toString()] = convertStringToPath(path)
+                        brushColorMap[snapshot.key.toString()] = brushColor
+                        strokeMap[snapshot.key.toString()] = brushStroke.toFloat()
+                        alphaMap[snapshot.key.toString()] = brushAlpha.toInt()
+                    }catch (e: Exception){
+                        drawMap.clear()
+                        brushColorMap.clear()
+                        strokeMap.clear()
+                        alphaMap.clear()
+                        println(e)
+                    }
+                    updateCanvas(drawMap, brushColorMap, view)
+                }
 
-                updateCanvas(drawMap, brushColorMap, view)
             }
 
             override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
-                val path = snapshot.child("drawPath").value as String
-                bgColor = snapshot.child("bgColor").value as String
+                if (snapshot.value != null){
+                    getScreenRes(viewDrawingCanvas)
+                    try {
+                        val path = snapshot.child("drawPath").value as String
+                        bgColor = snapshot.child("bgColor").value as String
 
-                drawMap[snapshot.key.toString()] = convertStringToPath(path)
+                        drawMap[snapshot.key.toString()] = convertStringToPath(path)
+                    }catch (e: Exception){
+                        drawMap.clear()
+                        brushColorMap.clear()
+                        strokeMap.clear()
+                        alphaMap.clear()
+                        println(e)
+                    }
+                }else{
+                    drawMap.clear()
+                    brushColorMap.clear()
+                    strokeMap.clear()
+                    alphaMap.clear()
+                }
 
                 updateCanvas(drawMap, brushColorMap, view)
             }
@@ -98,13 +124,14 @@ class ViewDrawingInCanvas : AppCompatActivity() {
     }
 
 
-    fun getScreenRes(){
+    private fun getScreenRes(view: ImageView){
         scrRef.addListenerForSingleValueEvent(object : ValueEventListener{
             override fun onDataChange(snapshot: DataSnapshot) {
                 val w = snapshot.child("width").value as Long
                 val h = snapshot.child("height").value as Long
                 width = w.toInt()
                 height = h.toInt()
+                updateCanvas(drawMap, brushColorMap, view)
             }
 
             override fun onCancelled(error: DatabaseError) {
@@ -116,25 +143,23 @@ class ViewDrawingInCanvas : AppCompatActivity() {
     }
 
    fun updateCanvas(pathMap: HashMap<String, CustomPath>, colorMap: HashMap<String, String>, view: ImageView){
-       if (pathMap.isNotEmpty() && pathMap.size == colorMap.size)
+       if (pathMap.size == colorMap.size)
            drawToCanvas(pathMap, colorMap, view)
    }
 
     private fun drawToCanvas(pathMap: HashMap<String, CustomPath>, colorMap: HashMap<String, String>, view: ImageView){
         val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
-        val s = pathMap.size
 
         try {
-            pathMap.toSortedMap().forEach { it ->
+            if (pathMap.isNotEmpty()){
+                pathMap.toSortedMap().forEach { it ->
 
-                val brush = brushInit(colorMap[it.key]!!, strokeMap[it.key]!!, alphaMap[it.key.toString()]!!)
-                canvas.drawPath(it.value, brush)
-
+                    val brush = brushInit(colorMap[it.key]!!, strokeMap[it.key]!!, alphaMap[it.key.toString()]!!)
+                    canvas.drawPath(it.value, brush)
+                }
             }
 
-
-//            bgColorView.setColorFilter(Color.parseColor(bgColor))
             bgColorView.setBackgroundColor(Color.parseColor(bgColor))
 //            view.draw(canvas)
 

@@ -20,7 +20,7 @@
         android:focusableInTouchMode="false"
         android:focusable="false"
         android:elevation="1dp"
-        android:scaleType="center"
+        android:scaleType="fitCenter"
         />
 
 </RelativeLayout>
