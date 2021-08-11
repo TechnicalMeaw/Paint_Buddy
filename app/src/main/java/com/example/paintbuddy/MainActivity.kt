@@ -100,6 +100,10 @@ class MainActivity : AppCompatActivity() {
         backgroundExtraSpace.background = AppCompatResources.getDrawable(applicationContext, bgColor)
 
 
+//        canvas.setOnTouchListener { view, motionEvent ->
+//
+//        }
+
 //        slider = findViewById<LinearLayout>(R.id.sliderWindow)
 //        bgColor = findViewById(R.id.backgroundColorPane)
         update()
@@ -115,8 +119,11 @@ class MainActivity : AppCompatActivity() {
                 if ((pathList.size != pl || backgroundColor != bgColor) && flag == false){
 
                     try {
-                        sliderWindow.visibility = View.GONE
-                        backgroundColorPane.visibility = View.GONE
+//                        if (backgroundColor != bgColor)
+//                            backgroundColorPane.visibility = View.GONE
+
+                        if (pathList.size != pl)
+                            sliderWindow.visibility = View.GONE
 
                         addDrawInfoToFirebase(pathList, currentStroke, currentAlpha)
                         updateScreenResolution(canvas.width, canvas.height)
@@ -130,7 +137,7 @@ class MainActivity : AppCompatActivity() {
                     bgColor = backgroundColor
 
                 }
-            }, 2000, 50
+            }, 1000, 50
         )
 
     }
