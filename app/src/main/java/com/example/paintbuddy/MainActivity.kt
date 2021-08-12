@@ -122,8 +122,8 @@ class MainActivity : AppCompatActivity() {
 //                        if (backgroundColor != bgColor)
 //                            backgroundColorPane.visibility = View.GONE
 
-                        if (pathList.size != pl)
-                            sliderWindow.visibility = View.GONE
+//                        if (pathList.size != pl)
+//                            sliderWindow.visibility = View.GONE
 
                         addDrawInfoToFirebase(pathList, currentStroke, currentAlpha)
                         updateScreenResolution(canvas.width, canvas.height)
