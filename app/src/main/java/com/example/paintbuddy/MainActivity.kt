@@ -129,15 +129,15 @@ class MainActivity : AppCompatActivity() {
                         updateScreenResolution(canvas.width, canvas.height)
                         Log.d("MainActivity", "Updated Drawing :: Success")
 
+                        pl = pathList.size
+                        bgColor = backgroundColor
+
                     }catch (e : Exception){
                         Log.e("MainActivity","$e")
                     }
 
-                    pl = pathList.size
-                    bgColor = backgroundColor
-
                 }
-            }, 1000, 50
+            }, 100, 15
         )
 
     }

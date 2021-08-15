@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#6200EE</color>
-    <color name="colorPrimaryDark">#3700B3</color>
-    <color name="colorAccent">#03DAC5</color>
+    <color name="colorPrimary">#40CD94</color>
+    <color name="colorPrimaryDark">#40CD94</color>
+    <color name="colorAccent">#04D88E</color>
+    <color name="backgroundCyan">#D2FFF4</color>
     <color name="yellow">#FFBB33</color>
     <color name="eraser">#FFFFFF</color>
     <color name="purple">#AA66CC</color>

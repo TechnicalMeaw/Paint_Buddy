@@ -5,12 +5,17 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.view.View
+import android.widget.Toast
 import androidx.core.widget.addTextChangedListener
+import com.example.paintbuddy.IntentStrings.Companion.PHONE_NUMBER
 import kotlinx.android.synthetic.main.activity_login.*
 import java.util.*
 import kotlin.concurrent.timerTask
 
 class LoginActivity : AppCompatActivity() {
+
+    var phoneNumber = ""
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
@@ -18,11 +23,15 @@ class LoginActivity : AppCompatActivity() {
 //        supportActionBar?.hide()
 
         nextButton.setOnClickListener {
-            val intent = Intent(this, MainMenuActivity::class.java)
-            startActivity(intent)
+            if (loginPhoneEditText.text!!.length == 10){
+                phoneNumber = cpp.selectedCountryCodeWithPlus + loginPhoneEditText.text.toString()
+                val intent = Intent(this, VerifyCodeActivity::class.java)
+                intent.putExtra(PHONE_NUMBER, phoneNumber)
+                startActivity(intent)
+            }else{
+                Toast.makeText(this, "Invalid Phone Number", Toast.LENGTH_SHORT).show()
+            }
         }
-
-        loginOTPEditTextField.visibility = View.GONE
         stopAnimation()
     }
 

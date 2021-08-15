@@ -18,12 +18,14 @@ class UploadDrawingInfo {
             val lSize = pathList.size
             val dSize = drawList.size
 
-            if (dSize == 0){
+            if (dSize == 0 && lSize <3){
                 updateDrawInfo(drawList.toList())
+                println("List Size Reduced to 0")
             }
 
             when {
                 lSize == 0 ->{
+                    println("List Size Reduced to 0")
                     drawList.clear()
                     updateDrawInfo(drawList.toList())
                 }
@@ -58,7 +60,7 @@ class UploadDrawingInfo {
                     val j = lSize - 1
 
                     for (n in i..j){
-                        val item = DrawItem(convertPathToString(pathList[i]), color, stroke, alpha, BgColor)
+                        val item = DrawItem(convertPathToString(pathList[n]), color, stroke, alpha, BgColor)
                         drawList.add(item)
 
                         /**
@@ -66,6 +68,7 @@ class UploadDrawingInfo {
                         * To Firebase Database
                         * */
                         addNodeToDrawingInfo(item, (n).toLong())
+                        println("List Size Increased")
                     }
                 }
             }

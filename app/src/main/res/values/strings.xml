@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Paint Buddy</string>
+    <string name="resend"><u>Resend</u></string>
+    <string name="not_you"><u>Not you?</u></string>
 </resources>
