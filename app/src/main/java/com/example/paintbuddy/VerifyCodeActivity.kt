@@ -8,7 +8,9 @@ import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.example.paintbuddy.IntentStrings.Companion.PHONE_NUMBER
+import com.example.paintbuddy.constants.DatabaseLocations.Companion.USERINFO_LOCATION
+import com.example.paintbuddy.constants.IntentStrings.Companion.COUNTRY
+import com.example.paintbuddy.constants.IntentStrings.Companion.PHONE_NUMBER
 import com.google.firebase.FirebaseException
 import com.google.firebase.FirebaseTooManyRequestsException
 import com.google.firebase.auth.*
@@ -22,18 +24,24 @@ import java.util.concurrent.TimeUnit
 
 class VerifyCodeActivity : AppCompatActivity() {
     private var phoneNumber = ""
+    private var countryName = ""
     private var notificationToken: String? = ""
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_verify_code)
 
         phoneNumber = intent.getStringExtra(PHONE_NUMBER)!!
+        countryName = intent.getStringExtra(COUNTRY)!!
+
         verifyPhoneNumber.text = " " + phoneNumber.substring(0,phoneNumber.length - 10) + "-" + phoneNumber.substring(phoneNumber.length-10,phoneNumber.length)
 
-        verifyCodeBtn.setOnClickListener {
-            val intent = Intent(this, RegisterUserActivity::class.java)
-            startActivity(intent)
-        }
+//        verifyCodeBtn.setOnClickListener {
+//            val intent = Intent(this, RegisterUserActivity::class.java)
+//            startActivity(intent)
+//        }
+
+        // Send the OTP to phoneNumber
+        sendCode(phoneNumber)
 
         notYouBtn.setOnClickListener{ finish()}
 
@@ -185,7 +193,7 @@ class VerifyCodeActivity : AppCompatActivity() {
 
     private fun registerToDatabase(user: FirebaseUser?) {
 
-        val ref = FirebaseDatabase.getInstance().getReference("/users/${FirebaseAuth.getInstance().uid}")
+        val ref = FirebaseDatabase.getInstance().getReference("$USERINFO_LOCATION/${FirebaseAuth.getInstance().uid}")
         ref.addListenerForSingleValueEvent(object: ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (snapshot.exists()){
@@ -209,7 +217,9 @@ class VerifyCodeActivity : AppCompatActivity() {
     fun redirectToEnterUserInfo(){
         val intent = Intent(this, RegisterUserActivity::class.java)
         intent.putExtra(PHONE_NUMBER, phoneNumber)
+        intent.putExtra(COUNTRY, countryName)
         startActivity(intent)
+        finish()
     }
 
 

@@ -1,6 +1,7 @@
 package com.example.paintbuddy
 
 import android.util.Log
+import com.example.paintbuddy.firebaseClasses.DrawItem
 import com.google.firebase.database.FirebaseDatabase
 
 class UpdateOperations {

@@ -9,6 +9,15 @@
     android:background="@drawable/background_default">
 
     <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="SKIP"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:layout_margin="10dp"
+        android:onClick="skip"/>
+
+    <TextView
         android:id="@+id/appNameTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -31,7 +40,7 @@
 
         android:layout_marginTop="-3dp"
         app:lottie_autoPlay="true"
-        app:lottie_rawRes="@raw/drawing_pencil" />
+        app:lottie_rawRes="@raw/drawing_pencil_green" />
 
 
     <RelativeLayout
@@ -68,21 +77,25 @@
                     android:layout_gravity="center_vertical"
                     app:ccp_countryPreference="IN,US,JP,RU"
                     app:ccp_defaultPhoneCode="91"
-                    app:ccp_showFlag="false"/>
+                    app:ccp_showFlag="true"
+                    app:ccp_showPhoneCode="false"/>
 
                 <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/loginPhoneFieldLayout"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="5dp"
-                    android:hint="Phone">
+                    android:hint="Phone"
+                    app:prefixText="+91"
+                    app:prefixTextColor="@color/design_default_color_primary"
+                    app:startIconDrawable="@android:drawable/stat_sys_phone_call">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/loginPhoneEditText"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:inputType="phone"
-                        />
+                        android:inputType="phone" />
 
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -96,25 +109,33 @@
 
     </RelativeLayout>
 
-    <Button
-        android:id="@+id/nextButton"
-        android:layout_below="@+id/phoneInputField"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="22dp"
-        android:text="Next"
-        android:textAllCaps="false"
-        android:textColor="@color/eraser"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:background="@drawable/button_selector"
-        android:backgroundTint="@color/colorAccent"
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/creditsTextView"
+        android:layout_below="@+id/phoneInputField">
 
-        app:elevation="10dp"
-        />
+        <Button
+            android:id="@+id/nextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:background="@drawable/button_selector"
+            android:backgroundTint="@color/colorAccent"
+            android:text="Next"
+
+            android:textAllCaps="false"
+            android:textColor="@color/eraser"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:elevation="10dp" />
+
+    </RelativeLayout>
+
+
 
     <TextView
+        android:id="@+id/creditsTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"

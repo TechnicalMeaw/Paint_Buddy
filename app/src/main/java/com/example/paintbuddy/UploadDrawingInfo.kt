@@ -1,5 +1,6 @@
 package com.example.paintbuddy
 
+import com.example.paintbuddy.firebaseClasses.DrawItem
 import com.example.paintbuddy.StringConversions.Companion.convertPathToString
 import com.example.paintbuddy.UpdateOperations.Companion.addNodeToDrawingInfo
 import com.example.paintbuddy.UpdateOperations.Companion.deleteNodeFromDrawInfo
