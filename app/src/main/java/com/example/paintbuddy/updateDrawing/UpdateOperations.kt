@@ -1,6 +1,7 @@
-package com.example.paintbuddy
+package com.example.paintbuddy.updateDrawing
 
 import android.util.Log
+import com.example.paintbuddy.R
 import com.example.paintbuddy.firebaseClasses.DrawItem
 import com.google.firebase.database.FirebaseDatabase
 

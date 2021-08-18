@@ -22,12 +22,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import com.example.paintbuddy.CanvasView.*
-import com.example.paintbuddy.UpdateOperations.Companion.bgColor
-import com.example.paintbuddy.UpdateOperations.Companion.updateScreenResolution
-import com.example.paintbuddy.UploadDrawingInfo.Companion.BgColor
-import com.example.paintbuddy.UploadDrawingInfo.Companion.addDrawInfoToFirebase
-import com.example.paintbuddy.UploadDrawingInfo.Companion.color
-import com.example.paintbuddy.UploadDrawingInfo.Companion.drawList
+import com.example.paintbuddy.updateDrawing.UpdateOperations.Companion.bgColor
+import com.example.paintbuddy.updateDrawing.UpdateOperations.Companion.updateScreenResolution
+import com.example.paintbuddy.updateDrawing.UploadDrawingInfo.Companion.BgColor
+import com.example.paintbuddy.updateDrawing.UploadDrawingInfo.Companion.addDrawInfoToFirebase
+import com.example.paintbuddy.updateDrawing.UploadDrawingInfo.Companion.color
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.File
 import java.io.FileOutputStream

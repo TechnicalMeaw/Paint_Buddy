@@ -12,6 +12,9 @@ import android.view.ViewGroup;
 
 import androidx.annotation.Nullable;
 
+import com.example.paintbuddy.customClasses.CustomPaint;
+import com.example.paintbuddy.customClasses.CustomPath;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 

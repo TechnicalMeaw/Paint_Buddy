@@ -1,13 +1,16 @@
 package com.example.paintbuddy
 
+import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import com.example.paintbuddy.local.LocalStorage.Companion.status
 import com.example.paintbuddy.constants.DatabaseLocations
 import com.example.paintbuddy.constants.IntentStrings.Companion.COUNTRY
 import com.example.paintbuddy.constants.IntentStrings.Companion.PHONE_NUMBER
+import com.example.paintbuddy.local.LocalStorage
 import com.google.firebase.FirebaseApp
 import com.google.firebase.appcheck.FirebaseAppCheck
 import com.google.firebase.appcheck.safetynet.SafetyNetAppCheckProviderFactory
@@ -33,8 +36,6 @@ class LoginActivity : AppCompatActivity() {
         firebaseAppCheck.installAppCheckProviderFactory(
             SafetyNetAppCheckProviderFactory.getInstance()
         )
-
-        checkLogin()
 
         nextButton.setOnClickListener {
             if (loginPhoneEditText.text!!.length == 10){
@@ -69,40 +70,6 @@ class LoginActivity : AppCompatActivity() {
     }
 
 
-    private fun checkLogin(){
-        if(FirebaseAuth.getInstance().uid != null){
-            checkRegistered()
-        }
-    }
-
-
-    private fun checkRegistered(){
-        val ref = FirebaseDatabase.getInstance().getReference("${DatabaseLocations.USERINFO_LOCATION}/${FirebaseAuth.getInstance().uid}")
-        ref.addListenerForSingleValueEvent(object: ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                if (snapshot.hasChild("First Name")) {
-                    val intent = Intent(this@LoginActivity, MainMenuActivity::class.java)
-                    startActivity(intent)
-                    finish()
-                }
-                else if (snapshot.exists()) {
-                    val intent = Intent(this@LoginActivity, RegisterUserActivity::class.java)
-                    startActivity(intent)
-                    finish()
-                }
-//                else {
-//                    val intent = Intent(this@LoginActivity, RegisterUserActivity::class.java)
-//                    startActivity(intent)
-//                    finish()
-//                }
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                TODO("Not yet implemented")
-            }
-
-        })
-    }
 
     fun skip(view: View) {
         val intent = Intent(this, MainMenuActivity::class.java)

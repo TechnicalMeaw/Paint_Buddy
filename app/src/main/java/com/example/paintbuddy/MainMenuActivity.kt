@@ -17,7 +17,6 @@ class MainMenuActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main_menu)
 
         if (FirebaseAuth.getInstance().uid != null)
-//            checkRegistered()
 
         drawBtn.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
@@ -31,31 +30,5 @@ class MainMenuActivity : AppCompatActivity() {
         }
     }
 
-//    private fun checkRegistered(){
-//        val ref = FirebaseDatabase.getInstance().getReference("$USERINFO_LOCATION/${FirebaseAuth.getInstance().uid}")
-//        ref.addListenerForSingleValueEvent(object: ValueEventListener{
-//            override fun onDataChange(snapshot: DataSnapshot) {
-//                when {
-//                    !snapshot.exists() -> {
-//                        val intent = Intent(this@MainMenuActivity, LoginActivity::class.java)
-//                        startActivity(intent)
-//                        finish()
-//                    }
-//                    snapshot.hasChild("First Name") -> {
-//                        TODO()
-//                    }
-//                    else -> {
-//                        val intent = Intent(this@MainMenuActivity, RegisterUserActivity::class.java)
-//                        startActivity(intent)
-//                        finish()
-//                    }
-//                }
-//            }
-//
-//            override fun onCancelled(error: DatabaseError) {
-//                TODO("Not yet implemented")
-//            }
-//
-//        })
-//    }
+
 }

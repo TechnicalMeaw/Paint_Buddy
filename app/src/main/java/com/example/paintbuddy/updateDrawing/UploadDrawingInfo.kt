@@ -1,11 +1,12 @@
-package com.example.paintbuddy
+package com.example.paintbuddy.updateDrawing
 
 import com.example.paintbuddy.firebaseClasses.DrawItem
-import com.example.paintbuddy.StringConversions.Companion.convertPathToString
-import com.example.paintbuddy.UpdateOperations.Companion.addNodeToDrawingInfo
-import com.example.paintbuddy.UpdateOperations.Companion.deleteNodeFromDrawInfo
-import com.example.paintbuddy.UpdateOperations.Companion.updateDrawInfo
-import com.example.paintbuddy.UpdateOperations.Companion.updateNodeToDrawingInfo
+import com.example.paintbuddy.conversion.StringConversions.Companion.convertPathToString
+import com.example.paintbuddy.updateDrawing.UpdateOperations.Companion.addNodeToDrawingInfo
+import com.example.paintbuddy.updateDrawing.UpdateOperations.Companion.deleteNodeFromDrawInfo
+import com.example.paintbuddy.updateDrawing.UpdateOperations.Companion.updateDrawInfo
+import com.example.paintbuddy.updateDrawing.UpdateOperations.Companion.updateNodeToDrawingInfo
+import com.example.paintbuddy.customClasses.CustomPath
 
 
 class UploadDrawingInfo {

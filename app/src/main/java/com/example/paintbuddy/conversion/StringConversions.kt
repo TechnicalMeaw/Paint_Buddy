@@ -1,7 +1,10 @@
-package com.example.paintbuddy
+package com.example.paintbuddy.conversion
 
 import android.util.Base64
-import com.example.paintbuddy.PathConversions.*
+import com.example.paintbuddy.Compressor
+import com.example.paintbuddy.conversion.PathConversions.*
+import com.example.paintbuddy.customClasses.CustomPaint
+import com.example.paintbuddy.customClasses.CustomPath
 
 class StringConversions {
     companion object{
@@ -21,7 +24,7 @@ class StringConversions {
             return convertToBase64String(byteArray);
         }
 
-        fun convertStringToPath(string: String) : CustomPath{
+        fun convertStringToPath(string: String) : CustomPath {
             val decompressedArray = convertToByteArray(string)
             return decodeToCustomPath(decompressedArray)
         }
@@ -31,7 +34,7 @@ class StringConversions {
             return  convertToBase64String(byteArray)
         }
 
-        fun convertStringToBrush(string: String) : CustomPaint{
+        fun convertStringToBrush(string: String) : CustomPaint {
             val decompressedArray = convertToByteArray(string)
             return decodeToCustomPaint(decompressedArray)
         }

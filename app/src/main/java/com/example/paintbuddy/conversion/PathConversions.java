@@ -1,6 +1,7 @@
-package com.example.paintbuddy;
+package com.example.paintbuddy.conversion;
 
-import android.graphics.Paint;
+import com.example.paintbuddy.customClasses.CustomPaint;
+import com.example.paintbuddy.customClasses.CustomPath;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

@@ -1,4 +1,4 @@
-package com.example.paintbuddy;
+package com.example.paintbuddy.customClasses;
 
 import android.graphics.Paint;
 

@@ -1,16 +1,18 @@
 package com.example.paintbuddy
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.provider.MediaStore.Images.Media.getBitmap
 import android.util.Patterns
 import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.graphics.drawable.toBitmap
 import com.bumptech.glide.Glide
+import com.example.paintbuddy.local.LocalStorage.Companion.status
 import com.example.paintbuddy.constants.DatabaseLocations.Companion.USERINFO_LOCATION
 import com.example.paintbuddy.constants.IntentStrings.Companion.CHOOSE_IMAGE
 import com.example.paintbuddy.constants.IntentStrings.Companion.COUNTRY
@@ -18,12 +20,14 @@ import com.example.paintbuddy.constants.IntentStrings.Companion.PHONE_NUMBER
 import com.example.paintbuddy.constants.StorageLocations
 import com.example.paintbuddy.firebaseClasses.UserItem
 import com.example.paintbuddy.imageOperations.ImageResizer
+import com.example.paintbuddy.local.LocalStorage
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.android.synthetic.main.activity_register_user.*
 import java.io.ByteArrayOutputStream
 import java.util.*
+
 
 class RegisterUserActivity : AppCompatActivity() {
 
@@ -80,7 +84,7 @@ class RegisterUserActivity : AppCompatActivity() {
     }
 
     private fun bitmapToByteArray(bitmap: Bitmap): ByteArray {
-        val bitmap = ImageResizer.generateThumb(bitmap, 1000)
+        val bitmap = ImageResizer.generateThumb(bitmap, 25000)
         val stream = ByteArrayOutputStream()
         bitmap.compress(Bitmap.CompressFormat.JPEG, 90, stream)
 
@@ -93,6 +97,8 @@ class RegisterUserActivity : AppCompatActivity() {
         val user = UserItem(firstName, lastName, phoneNumber, email, dpUrl, countryName, FirebaseAuth.getInstance().uid.toString(), notificationToken, "normal")
         ref.setValue(user).addOnSuccessListener {
             Toast.makeText(this, "Account Created", Toast.LENGTH_SHORT).show()
+            LocalStorage.sharedPref = getSharedPreferences("sharedPref", Context.MODE_PRIVATE)
+            status = "registered"
             val intent = Intent(this, MainMenuActivity::class.java)
             startActivity(intent)
             finish()
@@ -113,7 +119,9 @@ class RegisterUserActivity : AppCompatActivity() {
         if (requestCode == CHOOSE_IMAGE && resultCode == Activity.RESULT_OK && data != null){
             imageUri = data.data
             circleImageView.setImageURI(imageUri)
-            imageBitmap = Glide.with(this).asBitmap().load(imageUri).submit().get()
+            circleImageView.invalidate()
+            val dr = circleImageView.drawable
+            imageBitmap = dr.toBitmap()
             Glide.with(this).load(imageUri).into(circleImageView)
         }
     }

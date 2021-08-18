@@ -5,11 +5,11 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.os.Bundle
-import android.os.Handler
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
-import com.example.paintbuddy.StringConversions.Companion.convertStringToBrush
-import com.example.paintbuddy.StringConversions.Companion.convertStringToPath
+import com.example.paintbuddy.conversion.StringConversions.Companion.convertStringToPath
+import com.example.paintbuddy.customClasses.CustomPaint
+import com.example.paintbuddy.customClasses.CustomPath
 import com.google.firebase.database.*
 import kotlinx.android.synthetic.main.activity_view_drawing_in_canvas.*
 import java.lang.Exception
