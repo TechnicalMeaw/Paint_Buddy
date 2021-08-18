@@ -48,6 +48,7 @@ class RegisterUserActivity : AppCompatActivity() {
         notificationToken = MyFirebaseMessagingService.token.toString()
         countryName = intent.getStringExtra(COUNTRY).toString()
 
+        LocalStorage.sharedPref = getSharedPreferences("sharedPref", Context.MODE_PRIVATE)
 
         createAccountButton.setOnClickListener {
             firstName = loginFirstNameEditText.text.toString()
@@ -97,7 +98,7 @@ class RegisterUserActivity : AppCompatActivity() {
         val user = UserItem(firstName, lastName, phoneNumber, email, dpUrl, countryName, FirebaseAuth.getInstance().uid.toString(), notificationToken, "normal")
         ref.setValue(user).addOnSuccessListener {
             Toast.makeText(this, "Account Created", Toast.LENGTH_SHORT).show()
-            LocalStorage.sharedPref = getSharedPreferences("sharedPref", Context.MODE_PRIVATE)
+//            LocalStorage.sharedPref = getSharedPreferences("sharedPref", Context.MODE_PRIVATE)
             status = "registered"
             val intent = Intent(this, MainMenuActivity::class.java)
             startActivity(intent)

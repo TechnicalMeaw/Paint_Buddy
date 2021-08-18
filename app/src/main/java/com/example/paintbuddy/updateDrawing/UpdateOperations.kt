@@ -2,14 +2,17 @@ package com.example.paintbuddy.updateDrawing
 
 import android.util.Log
 import com.example.paintbuddy.R
+import com.example.paintbuddy.constants.DatabaseLocations.Companion.DRAWING_LOCATION
+import com.example.paintbuddy.constants.DatabaseLocations.Companion.SCREEN_RES_LOCATION
 import com.example.paintbuddy.firebaseClasses.DrawItem
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 
 class UpdateOperations {
     companion object{
         var bgColor = R.color.eraser
 
-        private val drawRef = FirebaseDatabase.getInstance().getReference("/DrawInfo/")
+        private val drawRef = FirebaseDatabase.getInstance().getReference("$DRAWING_LOCATION/${FirebaseAuth.getInstance().uid}")
         fun updateDrawInfo(itemList: List<DrawItem>){
             /**
             * If the list is empty then
@@ -28,7 +31,7 @@ class UpdateOperations {
             }
         }
 
-        private val drawPushRef = FirebaseDatabase.getInstance().getReference("/DrawInfo/").push()
+        private val drawPushRef = FirebaseDatabase.getInstance().getReference("$DRAWING_LOCATION/${FirebaseAuth.getInstance().uid}").push()
         fun addNodeToDrawingInfo(item: DrawItem, index: Long){
             /**
             * Create a HashMap of Index
@@ -62,7 +65,7 @@ class UpdateOperations {
             }
         }
 
-        private val scrRef = FirebaseDatabase.getInstance().getReference("/ScreenRes/")
+        private val scrRef = FirebaseDatabase.getInstance().getReference("$SCREEN_RES_LOCATION/${FirebaseAuth.getInstance().uid}")
         fun updateScreenResolution(width: Int, height: Int){
             /**
             * Create a HashMap of

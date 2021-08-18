@@ -27,6 +27,7 @@ import com.example.paintbuddy.updateDrawing.UpdateOperations.Companion.updateScr
 import com.example.paintbuddy.updateDrawing.UploadDrawingInfo.Companion.BgColor
 import com.example.paintbuddy.updateDrawing.UploadDrawingInfo.Companion.addDrawInfoToFirebase
 import com.example.paintbuddy.updateDrawing.UploadDrawingInfo.Companion.color
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.File
 import java.io.FileOutputStream
@@ -105,7 +106,10 @@ class MainActivity : AppCompatActivity() {
 
 //        slider = findViewById<LinearLayout>(R.id.sliderWindow)
 //        bgColor = findViewById(R.id.backgroundColorPane)
-        update()
+
+        if (FirebaseAuth.getInstance().uid != null){
+            update()
+        }
     }
 
 

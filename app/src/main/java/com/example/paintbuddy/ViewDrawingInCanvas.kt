@@ -4,31 +4,50 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.net.Uri
 import android.os.Bundle
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.example.paintbuddy.constants.DatabaseLocations
+import com.example.paintbuddy.constants.DatabaseLocations.Companion.DRAWING_LOCATION
+import com.example.paintbuddy.constants.DatabaseLocations.Companion.SCREEN_RES_LOCATION
 import com.example.paintbuddy.conversion.StringConversions.Companion.convertStringToPath
 import com.example.paintbuddy.customClasses.CustomPaint
 import com.example.paintbuddy.customClasses.CustomPath
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import kotlinx.android.synthetic.main.activity_view_drawing_in_canvas.*
-import java.lang.Exception
+
 
 class ViewDrawingInCanvas : AppCompatActivity() {
-    private val drawRef = FirebaseDatabase.getInstance().getReference("/DrawInfo/")
-    private val scrRef = FirebaseDatabase.getInstance().getReference("/ScreenRes/")
+    private var drawRef = FirebaseDatabase.getInstance().getReference("${DRAWING_LOCATION}/${FirebaseAuth.getInstance().uid}/")
+    private var scrRef = FirebaseDatabase.getInstance().getReference("$SCREEN_RES_LOCATION/${FirebaseAuth.getInstance().uid}/")
     var width = 1080
     var height = 1980
-
     var bgColor = "#FFFFFF"
+    var location = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_view_drawing_in_canvas)
 
-        getScreenRes(viewDrawingCanvas)
-        updateCanvas(viewDrawingCanvas)
 
+
+        val data: Uri? = intent.data
+        if (data!= null && data.toString().length > 35){
+            location = data.toString().substring(32)
+            drawRef = FirebaseDatabase.getInstance().getReference("${DRAWING_LOCATION}/${location}/")
+            scrRef = FirebaseDatabase.getInstance().getReference("$SCREEN_RES_LOCATION/${location}/")
+        }
+
+        try {
+            getScreenRes(viewDrawingCanvas)
+        }catch (e: Exception){
+            Toast.makeText(this, "Invalid Link", Toast.LENGTH_SHORT).show()
+        }
+
+        updateCanvas(viewDrawingCanvas)
     }
 
     private fun brushInit(color: String, stroke: Float, alpha: Int): CustomPaint {

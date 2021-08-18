@@ -17,10 +17,11 @@ class FlashScreenActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_flash_screen)
 
+        LocalStorage.sharedPref = getSharedPreferences("sharedPref", Context.MODE_PRIVATE)
         checkStatus()
     }
 
-    fun checkStatus(){
+    private fun checkStatus(){
         when {
             FirebaseAuth.getInstance().uid == null -> {
                 val intent = Intent(this, LoginActivity::class.java)
@@ -43,7 +44,6 @@ class FlashScreenActivity : AppCompatActivity() {
         ref.addListenerForSingleValueEvent(object: ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (snapshot.hasChild("firstName")) {
-                    LocalStorage.sharedPref = getSharedPreferences("sharedPref", Context.MODE_PRIVATE)
                     LocalStorage.status = "registered"
                     val intent = Intent(this@FlashScreenActivity, MainMenuActivity::class.java)
                     startActivity(intent)

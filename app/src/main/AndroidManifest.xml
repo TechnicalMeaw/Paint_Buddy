@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.example.paintbuddy">
 
     <application
@@ -9,8 +10,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".FlashScreenActivity"
-                  android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+        <activity
+            android:name=".FlashScreenActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -23,9 +25,22 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".LoginActivity" />
         </activity>
-        <activity android:name=".LoginActivity">
+        <activity android:name=".LoginActivity"></activity>
+        <activity android:name=".ViewDrawingInCanvas">
+            <tools:validation testUrl="https://paintbuddy.com/drawing/jhkxEcxyyzS66DR5rn4GC4YkaOa2" />
+            <tools:validation testUrl="https://paintbuddy.com/drawing" />
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:scheme="https"
+                    android:host="paintbuddy.com"
+                    android:pathPrefix="/drawing" />
+            </intent-filter>
         </activity>
-        <activity android:name=".ViewDrawingInCanvas" />
         <activity android:name=".MainMenuActivity" />
         <activity android:name=".MainActivity" />
 

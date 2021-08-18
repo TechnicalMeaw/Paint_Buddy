@@ -14,5 +14,13 @@ class LocalStorage {
             set(value) {
                 sharedPref?.edit()?.putString("status", value)?.apply()
             }
+
+//        var mode: String?
+//            get() {
+//                return sharedPref?.getString("mode", "")
+//            }
+//            set(value) {
+//                sharedPref?.edit()?.putString("mode", value)?.apply()
+//            }
     }
 }
