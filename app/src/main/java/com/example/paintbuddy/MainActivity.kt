@@ -2,6 +2,7 @@ package com.example.paintbuddy
 
 import android.content.ContentValues
 import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Bitmap.createBitmap
 import android.graphics.Canvas
@@ -170,6 +171,21 @@ class MainActivity : AppCompatActivity() {
             }
             R.id.saveBtn -> {
                 saveToGallery(this, getBitmapFromView(canvas, true), "Paint Buddy")
+            }
+            R.id.shareBtn -> {
+                if (FirebaseAuth.getInstance().uid != null){
+                    val sendIntent: Intent = Intent().apply {
+                        action = Intent.ACTION_SEND
+                        putExtra(Intent.EXTRA_TEXT, "https://paintbuddy.com/drawing/${FirebaseAuth.getInstance().uid}")
+                        type = "text/plain"
+                    }
+                    val shareIntent = Intent.createChooser(sendIntent, null)
+                    startActivity(shareIntent)
+                }else{
+                    Toast.makeText(this, "You are not logged in", Toast.LENGTH_SHORT).show()
+                    val intent = Intent(this, LoginActivity::class.java)
+                    startActivity(intent)
+                }
             }
         }
         return super.onOptionsItemSelected(item)

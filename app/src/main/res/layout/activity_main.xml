@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity"
-    android:background="#FFFFFF">
+    tools:context=".MainActivity">
+
 
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -20,7 +20,7 @@
         android:id="@+id/canvas"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/toolDoc"
+        android:layout_above="@id/toolPane"
         />
 
 
@@ -28,7 +28,7 @@
         android:id="@+id/sliderWindow"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/toolDoc"
+        android:layout_above="@+id/toolPane"
         android:layout_margin="2dp"
         android:orientation="vertical"
         android:visibility="gone"
@@ -71,7 +71,7 @@
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_gravity="center"
-                android:backgroundTint="@android:color/holo_green_light"
+                android:backgroundTint="@android:color/holo_green_dark"
                 android:background="@drawable/color_btn"
                 android:elevation="2dp"
                 android:layout_margin="10dp"
@@ -163,7 +163,8 @@
             android:layout_alignBottom="@+id/canvas"
             android:layout_margin="5dp"
             android:orientation="horizontal"
-            android:weightSum="25">
+            android:weightSum="25"
+            android:elevation="5dp">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -196,19 +197,18 @@
 
 
 
-
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/toolDoc"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:background="@drawable/color_doc"
-        android:layout_alignParentBottom="true"/>
+    <!--    <androidx.constraintlayout.widget.ConstraintLayout-->
+    <!--        android:id="@+id/toolDoc"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="40dp"-->
+    <!--        android:background="@drawable/color_doc"-->
+    <!--        android:layout_alignParentBottom="true"/>-->
 
     <LinearLayout
         android:id="@+id/toolPane"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="42dp"
+        android:background="@drawable/color_doc"
         android:layout_alignParentBottom="true"
         android:paddingStart="10dp"
         android:paddingEnd="10dp"
@@ -247,10 +247,11 @@
 
             <Button
                 android:id="@+id/undoToolBtn"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
                 android:layout_gravity="center"
-                android:background="@drawable/ic_baseline_undo_24"
+                android:background="@drawable/undo_1"
+                android:backgroundTint="@color/eraser"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -267,11 +268,11 @@
 
             <Button
                 android:id="@+id/redoToolBtn"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
                 android:layout_gravity="center"
-                android:background="@drawable/ic_baseline_redo_24"
-
+                android:background="@drawable/redo_1"
+                android:backgroundTint="@color/eraser"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -287,8 +288,8 @@
 
             <Button
                 android:id="@+id/backgroundToolBtn"
-                android:layout_width="28dp"
-                android:layout_height="28dp"
+                android:layout_width="27dp"
+                android:layout_height="27dp"
                 android:layout_gravity="center"
                 android:background="@drawable/ic_background_paint_24"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -311,6 +312,7 @@
                 android:layout_gravity="center"
                 android:layout_margin="5dp"
                 android:background="@drawable/eraser"
+                android:backgroundTint="@color/eraser"
                 android:onClick="erase"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -326,7 +328,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="2dp"
-        android:layout_above="@+id/toolDoc"
+        android:layout_above="@+id/toolPane"
         android:background="@drawable/background_round"
         android:backgroundTint="@color/dark_white"
         android:visibility="gone">
@@ -434,7 +436,6 @@
             android:onClick="BgWhite"
             />
     </LinearLayout>
-
 
 
 

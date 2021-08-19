@@ -28,6 +28,11 @@ class MainMenuActivity : AppCompatActivity() {
             val intent = Intent(this, ViewDrawingInCanvas::class.java)
             startActivity(intent)
         }
+
+        fab.setOnClickListener {
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+        }
     }
 
 

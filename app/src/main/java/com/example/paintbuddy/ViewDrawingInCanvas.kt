@@ -6,6 +6,7 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -36,16 +37,14 @@ class ViewDrawingInCanvas : AppCompatActivity() {
 
         val data: Uri? = intent.data
         if (data!= null && data.toString().length > 35){
-            location = data.toString().substring(32)
+            location = data.toString().substring(31)
             drawRef = FirebaseDatabase.getInstance().getReference("${DRAWING_LOCATION}/${location}/")
             scrRef = FirebaseDatabase.getInstance().getReference("$SCREEN_RES_LOCATION/${location}/")
+            Log.d("ViewDraw", "uri: $data, location: $location")
         }
 
-        try {
-            getScreenRes(viewDrawingCanvas)
-        }catch (e: Exception){
-            Toast.makeText(this, "Invalid Link", Toast.LENGTH_SHORT).show()
-        }
+
+        getScreenRes(viewDrawingCanvas)
 
         updateCanvas(viewDrawingCanvas)
     }
@@ -146,11 +145,16 @@ class ViewDrawingInCanvas : AppCompatActivity() {
     private fun getScreenRes(view: ImageView){
         scrRef.addListenerForSingleValueEvent(object : ValueEventListener{
             override fun onDataChange(snapshot: DataSnapshot) {
-                val w = snapshot.child("width").value as Long
-                val h = snapshot.child("height").value as Long
-                width = w.toInt()
-                height = h.toInt()
-                updateCanvas(drawMap, brushColorMap, view)
+                try {
+                    val w = snapshot.child("width").value as Long
+                    val h = snapshot.child("height").value as Long
+                    width = w.toInt()
+                    height = h.toInt()
+                    updateCanvas(drawMap, brushColorMap, view)
+
+                }catch (e: Exception){
+                    Toast.makeText(this@ViewDrawingInCanvas, "Invalid Link", Toast.LENGTH_SHORT).show()
+                }
             }
 
             override fun onCancelled(error: DatabaseError) {

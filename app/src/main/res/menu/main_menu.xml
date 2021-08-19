@@ -15,6 +15,13 @@
         android:title="Save"
         app:showAsAction="ifRoom" />
 
+    <item
+        android:id="@+id/shareBtn"
+        android:icon="?attr/actionModeShareDrawable"
+        android:iconTint="@color/eraser"
+        android:title="Share"
+        app:showAsAction="ifRoom"/>
+
 
     <item
         android:id="@+id/undoBtn"
