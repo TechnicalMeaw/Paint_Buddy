@@ -3,25 +3,26 @@ package com.example.paintbuddy
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import com.bumptech.glide.Glide
 import com.example.paintbuddy.constants.DatabaseLocations.Companion.USERINFO_LOCATION
+import com.example.paintbuddy.constants.IntentStrings.Companion.NEW_DRAW_ID
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.xwray.groupie.GroupAdapter
+import com.xwray.groupie.GroupieViewHolder
 import kotlinx.android.synthetic.main.activity_main_menu.*
+import java.util.*
 
 class MainMenuActivity : AppCompatActivity() {
+
+    private val adapter = GroupAdapter<GroupieViewHolder>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main_menu)
-
-        if (FirebaseAuth.getInstance().uid != null)
-
-        drawBtn.setOnClickListener {
-            val intent = Intent(this, MainActivity::class.java)
-            startActivity(intent)
-        }
 
 
         viewCanvasBtn.setOnClickListener {
@@ -31,8 +32,11 @@ class MainMenuActivity : AppCompatActivity() {
 
         fab.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
+            intent.putExtra(NEW_DRAW_ID, UUID.randomUUID().toString())
             startActivity(intent)
         }
+
+        drawingRecyclerView.adapter = this.adapter
     }
 
 

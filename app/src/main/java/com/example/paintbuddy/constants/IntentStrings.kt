@@ -6,5 +6,6 @@ class IntentStrings {
         const val COUNTRY = "COUNTRY"
         const val NOTIFICATION_TOKEN = "NOTIFICATION TOKEN"
         const val CHOOSE_IMAGE = 142
+        const val NEW_DRAW_ID = "NEW_DRAW_ID"
     }
 }

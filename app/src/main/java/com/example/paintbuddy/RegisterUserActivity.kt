@@ -44,6 +44,8 @@ class RegisterUserActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register_user)
 
+//        Glide.with(this).load(R.drawable.background_default).centerCrop().into(registerBg)
+
         phoneNumber = intent.getStringExtra(PHONE_NUMBER).toString()
         notificationToken = MyFirebaseMessagingService.token.toString()
         countryName = intent.getStringExtra(COUNTRY).toString()

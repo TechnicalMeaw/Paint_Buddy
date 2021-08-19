@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import com.bumptech.glide.Glide
 import com.example.paintbuddy.constants.DatabaseLocations
 import com.example.paintbuddy.local.LocalStorage
 import com.google.firebase.auth.FirebaseAuth
@@ -11,6 +12,7 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import kotlinx.android.synthetic.main.activity_flash_screen.*
 
 class FlashScreenActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -19,6 +21,8 @@ class FlashScreenActivity : AppCompatActivity() {
 
         LocalStorage.sharedPref = getSharedPreferences("sharedPref", Context.MODE_PRIVATE)
         checkStatus()
+
+//        Glide.with(this).load(R.drawable.background_default).centerCrop().into(flashScreenBg)
     }
 
     private fun checkStatus(){

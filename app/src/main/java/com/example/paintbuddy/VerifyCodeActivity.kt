@@ -8,6 +8,7 @@ import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.bumptech.glide.Glide
 import com.example.paintbuddy.constants.DatabaseLocations.Companion.USERINFO_LOCATION
 import com.example.paintbuddy.constants.IntentStrings.Companion.COUNTRY
 import com.example.paintbuddy.constants.IntentStrings.Companion.PHONE_NUMBER
@@ -29,6 +30,8 @@ class VerifyCodeActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_verify_code)
+
+//        Glide.with(this).load(R.drawable.background_default).centerCrop().into(verifyBg)
 
         phoneNumber = intent.getStringExtra(PHONE_NUMBER)!!
         countryName = intent.getStringExtra(COUNTRY)!!

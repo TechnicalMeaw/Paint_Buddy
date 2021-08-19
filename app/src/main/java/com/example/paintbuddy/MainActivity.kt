@@ -23,7 +23,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import com.example.paintbuddy.CanvasView.*
+import com.example.paintbuddy.constants.IntentStrings.Companion.NEW_DRAW_ID
 import com.example.paintbuddy.updateDrawing.UpdateOperations.Companion.bgColor
+import com.example.paintbuddy.updateDrawing.UpdateOperations.Companion.drawId
 import com.example.paintbuddy.updateDrawing.UpdateOperations.Companion.updateScreenResolution
 import com.example.paintbuddy.updateDrawing.UploadDrawingInfo.Companion.BgColor
 import com.example.paintbuddy.updateDrawing.UploadDrawingInfo.Companion.addDrawInfoToFirebase
@@ -40,10 +42,16 @@ import kotlin.concurrent.timerTask
 class MainActivity : AppCompatActivity() {
 
     private lateinit var paint: CanvasView
+    var drawingId = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        drawingId = intent.getStringExtra(NEW_DRAW_ID)!!
+
+        //Updating Firebase Location
+        drawId = drawingId
 
         paint = CanvasView(this)
 
@@ -270,7 +278,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun saveToGallery(context: Context, bitmap: Bitmap, albumName: String) {
-        val filename = "${System.currentTimeMillis()}.png"
+        val filename = "${drawingId}.png"
         val write: (OutputStream) -> Boolean = {
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, it)
         }
@@ -356,4 +364,5 @@ class MainActivity : AppCompatActivity() {
         backgroundToolBtn.backgroundTintList = ContextCompat.getColorStateList(this, color)
         backgroundExtraSpace.background = AppCompatResources.getDrawable(applicationContext, color)
     }
+
 }

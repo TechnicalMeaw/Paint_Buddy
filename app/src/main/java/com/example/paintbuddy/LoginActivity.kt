@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import com.bumptech.glide.Glide
 import com.example.paintbuddy.local.LocalStorage.Companion.status
 import com.example.paintbuddy.constants.DatabaseLocations
 import com.example.paintbuddy.constants.IntentStrings.Companion.COUNTRY
@@ -37,6 +38,8 @@ class LoginActivity : AppCompatActivity() {
         firebaseAppCheck.installAppCheckProviderFactory(
             SafetyNetAppCheckProviderFactory.getInstance()
         )
+
+//        Glide.with(this).load(R.drawable.background_default).centerCrop().into(loginBg)
 
         nextButton.setOnClickListener {
             if (loginPhoneEditText.text!!.length == 10){

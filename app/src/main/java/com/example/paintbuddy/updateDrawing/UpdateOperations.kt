@@ -11,8 +11,9 @@ import com.google.firebase.database.FirebaseDatabase
 class UpdateOperations {
     companion object{
         var bgColor = R.color.eraser
+        var drawId = ""
 
-        private val drawRef = FirebaseDatabase.getInstance().getReference("$DRAWING_LOCATION/${FirebaseAuth.getInstance().uid}")
+        private val drawRef = FirebaseDatabase.getInstance().getReference("$DRAWING_LOCATION/${FirebaseAuth.getInstance().uid}/$drawId")
         fun updateDrawInfo(itemList: List<DrawItem>){
             /**
             * If the list is empty then
@@ -31,7 +32,7 @@ class UpdateOperations {
             }
         }
 
-        private val drawPushRef = FirebaseDatabase.getInstance().getReference("$DRAWING_LOCATION/${FirebaseAuth.getInstance().uid}").push()
+        private val drawPushRef = FirebaseDatabase.getInstance().getReference("$DRAWING_LOCATION/${FirebaseAuth.getInstance().uid}/$drawId").push()
         fun addNodeToDrawingInfo(item: DrawItem, index: Long){
             /**
             * Create a HashMap of Index
@@ -65,7 +66,7 @@ class UpdateOperations {
             }
         }
 
-        private val scrRef = FirebaseDatabase.getInstance().getReference("$SCREEN_RES_LOCATION/${FirebaseAuth.getInstance().uid}")
+        private val scrRef = FirebaseDatabase.getInstance().getReference("$SCREEN_RES_LOCATION/${FirebaseAuth.getInstance().uid}/$drawId")
         fun updateScreenResolution(width: Int, height: Int){
             /**
             * Create a HashMap of

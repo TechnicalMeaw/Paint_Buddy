@@ -8,6 +8,7 @@
     android:theme="@style/Theme.MaterialComponents.Light"
     android:background="@drawable/background_default">
 
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -48,20 +49,19 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/appNameTitle"
-
-        android:layout_marginTop="15dp"
-        android:layout_marginStart="10dp"
-        android:layout_marginEnd="10dp"
-        android:paddingBottom="20dp"
-        android:paddingTop="15dp"
-        app:elevation="10dp"
-        android:background="@drawable/button_selector"
         >
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:layout_marginTop="15dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:paddingBottom="20dp"
+            android:paddingTop="15dp"
+            app:elevation="10dp"
+            android:background="@drawable/button_selector_layout">
 
 
             <LinearLayout
@@ -120,7 +120,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:background="@drawable/button_selector"
+            android:background="@drawable/button_selector_layout"
             android:backgroundTint="@color/colorAccent"
             android:text="Next"
 

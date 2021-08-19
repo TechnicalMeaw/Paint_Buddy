@@ -15,6 +15,8 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        vectorDrawables.useSupportLibrary = true
     }
 
     buildTypes {
@@ -81,5 +83,10 @@ dependencies {
 
     //App Check
     implementation 'com.google.firebase:firebase-appcheck-safetynet:16.0.0-beta02'
+
+    // Groupie
+    implementation "com.github.lisawray.groupie:groupie:2.9.0"
+    implementation "com.github.lisawray.groupie:groupie-viewbinding:2.9.0"
+
 
 }
