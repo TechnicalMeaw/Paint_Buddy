@@ -24,7 +24,6 @@ class MainMenuActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main_menu)
 
-
         viewCanvasBtn.setOnClickListener {
             val intent = Intent(this, ViewDrawingInCanvas::class.java)
             startActivity(intent)
@@ -32,12 +31,11 @@ class MainMenuActivity : AppCompatActivity() {
 
         fab.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
-            intent.putExtra(NEW_DRAW_ID, UUID.randomUUID().toString())
+//            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            intent.putExtra(NEW_DRAW_ID, "NEW")
             startActivity(intent)
         }
 
         drawingRecyclerView.adapter = this.adapter
     }
-
-
 }

@@ -18,22 +18,23 @@ import com.example.paintbuddy.customClasses.CustomPath;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+
 public class CanvasView extends View {
 
     public ViewGroup.LayoutParams params;
-    public static ArrayList<CustomPath> pathList = new ArrayList<>();
-    public static ArrayList<CustomPaint> brushList = new ArrayList<>();
-    public static CustomPath path = new CustomPath();
-    public static CustomPaint brush = new CustomPaint();
-    public static int currentColor = Color.BLACK;
-    static int currentAlpha = 255;
-    static float currentStroke = 5f;
-    public static Boolean erase = false;
-    public static int backgroundColor = Color.WHITE;
+    public ArrayList<CustomPath> pathList = new ArrayList<>();
+    public ArrayList<CustomPaint> brushList = new ArrayList<>();
+    public CustomPath path = new CustomPath();
+    public CustomPaint brush = new CustomPaint();
+    public int currentColor = Color.BLACK;
+    int currentAlpha = 255;
+    float currentStroke = 5f;
+    public Boolean erase = false;
+    public int backgroundColor = Color.WHITE;
 
     //For redo buffer
-    public static ArrayList<CustomPath> pathBufferList = new ArrayList<>();
-    public static ArrayList<CustomPaint> brushBufferList = new ArrayList<>();
+    public ArrayList<CustomPath> pathBufferList = new ArrayList<>();
+    public ArrayList<CustomPaint> brushBufferList = new ArrayList<>();
 
 //    private List<String> stringPaths = new ArrayList<String>();
 
@@ -138,7 +139,7 @@ public class CanvasView extends View {
 //        }
     }
 
-    public static void changeBrush(Boolean changedBrush){
+    public void changeBrush(Boolean changedBrush){
         if (!changedBrush){
             pathList.add(path);
             brushList.add(brush);
@@ -148,7 +149,7 @@ public class CanvasView extends View {
     }
 
 
-    public static void undo(){
+    public void undo(){
         if(!pathList.isEmpty() || !brushList.isEmpty()){
 
             pathBufferList.add(pathList.remove(pathList.size() -1));
@@ -157,7 +158,7 @@ public class CanvasView extends View {
         }
     }
 
-    public static void redo(){
+    public void redo(){
         if (!pathBufferList.isEmpty() || !brushBufferList.isEmpty()){
 
             pathList.add(pathBufferList.remove(pathBufferList.size()-1));
@@ -166,7 +167,7 @@ public class CanvasView extends View {
         }
     }
 
-    public static void clear(){
+    public void clear(){
         pathList.clear();
         brushList.clear();
     }

@@ -22,14 +22,15 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
-import com.example.paintbuddy.CanvasView.*
+import com.example.paintbuddy.CanvasView.flag
 import com.example.paintbuddy.constants.IntentStrings.Companion.NEW_DRAW_ID
-import com.example.paintbuddy.updateDrawing.UpdateOperations.Companion.bgColor
-import com.example.paintbuddy.updateDrawing.UpdateOperations.Companion.drawId
+import com.example.paintbuddy.local.DeleteCache.deleteCache
+//import com.example.paintbuddy.updateDrawing.UpdateOperations.Companion.bgColor
 import com.example.paintbuddy.updateDrawing.UpdateOperations.Companion.updateScreenResolution
-import com.example.paintbuddy.updateDrawing.UploadDrawingInfo.Companion.BgColor
-import com.example.paintbuddy.updateDrawing.UploadDrawingInfo.Companion.addDrawInfoToFirebase
-import com.example.paintbuddy.updateDrawing.UploadDrawingInfo.Companion.color
+import com.example.paintbuddy.updateDrawing.UploadDrawingInfo
+//import com.example.paintbuddy.updateDrawing.UploadDrawingInfo.Companion.BgColor
+//import com.example.paintbuddy.updateDrawing.UploadDrawingInfo.Companion.addDrawInfoToFirebase
+//import com.example.paintbuddy.updateDrawing.UploadDrawingInfo.Companion.color
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.File
@@ -38,27 +39,25 @@ import java.io.OutputStream
 import java.util.*
 import kotlin.concurrent.timerTask
 
-
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var paint: CanvasView
-    var drawingId = ""
+    private var drawingId = ""
+    var bgColor = R.color.eraser
+    private lateinit var updator: UploadDrawingInfo
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        drawingId = intent.getStringExtra(NEW_DRAW_ID)!!
+        updator = UploadDrawingInfo()
 
-        //Updating Firebase Location
-        drawId = drawingId
-
-        paint = CanvasView(this)
-
+        if (intent.getStringExtra(NEW_DRAW_ID).toString() == "NEW"){
+            drawingId = UUID.randomUUID().toString()
+        }
 
         alphaSlider.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                currentAlpha = progress
+                canvas.currentAlpha = progress
                 alphaSliderText.text = progress.toString()
             }
 
@@ -67,13 +66,13 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
-                changeBrush(true)
+                canvas.changeBrush(true)
             }
         })
 
         sizeSlider.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                currentStroke = progress.toFloat()
+                canvas.currentStroke = progress.toFloat()
                 sizeSliderText.text = progress.toString()
             }
 
@@ -82,17 +81,17 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
-                changeBrush(true)
+                canvas.changeBrush(true)
             }
         })
 
 
         undoToolBtn.setOnClickListener {
-            undo()
+            canvas.undo()
             canvas.invalidate()
         }
         redoToolBtn.setOnClickListener{
-            redo()
+            canvas.redo()
             canvas.invalidate()
         }
 
@@ -117,18 +116,19 @@ class MainActivity : AppCompatActivity() {
 //        bgColor = findViewById(R.id.backgroundColorPane)
 
         if (FirebaseAuth.getInstance().uid != null){
-            update()
+            update(drawingId)
         }
     }
 
 
-    private fun update(){
-        var pl = pathList.size
-        var bgColor = backgroundColor
-        Timer().scheduleAtFixedRate(
+    var timer = Timer()
+    private fun update(location: String){
+        var pl = canvas.pathList.size
+        var bgColor = canvas.backgroundColor
+        timer.scheduleAtFixedRate(
             timerTask {
 
-                if ((pathList.size != pl || backgroundColor != bgColor) && flag == false){
+                if ((canvas.pathList.size != pl || canvas.backgroundColor != bgColor) && flag == false){
 
                     try {
 //                        if (backgroundColor != bgColor)
@@ -137,12 +137,12 @@ class MainActivity : AppCompatActivity() {
 //                        if (pathList.size != pl)
 //                            sliderWindow.visibility = View.GONE
 
-                        addDrawInfoToFirebase(pathList, currentStroke, currentAlpha)
+                        updator.addDrawInfoToFirebase(canvas.pathList, canvas.currentStroke, canvas.currentAlpha, location)
                         updateScreenResolution(canvas.width, canvas.height)
                         Log.d("MainActivity", "Updated Drawing :: Success")
 
-                        pl = pathList.size
-                        bgColor = backgroundColor
+                        pl = canvas.pathList.size
+                        bgColor = canvas.backgroundColor
 
                     }catch (e : Exception){
                         Log.e("MainActivity","$e")
@@ -165,16 +165,16 @@ class MainActivity : AppCompatActivity() {
 
         when( item.itemId){
             R.id.undoBtn -> {
-                undo()
+                canvas.undo()
                 canvas.invalidate()
             }
             R.id.redoBtn -> {
-                redo()
+                canvas.redo()
                 canvas.invalidate()
-                addDrawInfoToFirebase(pathList, currentStroke, currentAlpha)
+                updator.addDrawInfoToFirebase(canvas.pathList, canvas.currentStroke, canvas.currentAlpha)
             }
             R.id.clearBtn -> {
-                clear()
+                canvas.clear()
                 canvas.invalidate()
             }
             R.id.saveBtn -> {
@@ -184,7 +184,7 @@ class MainActivity : AppCompatActivity() {
                 if (FirebaseAuth.getInstance().uid != null){
                     val sendIntent: Intent = Intent().apply {
                         action = Intent.ACTION_SEND
-                        putExtra(Intent.EXTRA_TEXT, "https://paintbuddy.com/drawing/${FirebaseAuth.getInstance().uid}")
+                        putExtra(Intent.EXTRA_TEXT, "https://paintbuddy.com/drawing/${FirebaseAuth.getInstance().uid}/$drawingId")
                         type = "text/plain"
                     }
                     val shareIntent = Intent.createChooser(sendIntent, null)
@@ -200,61 +200,61 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun Black(view: View) {
-        changeBrush(true)
+        canvas.changeBrush(true)
 
-        color = "#000000"
-        currentColor = Color.BLACK
+        updator.color = "#000000"
+        canvas.currentColor = Color.BLACK
         brushToolBtn.backgroundTintList = ContextCompat.getColorStateList(this, R.color.black)
-        erase = false
+        canvas.erase = false
     }
     fun Blue(view: View) {
-        changeBrush(true)
+        canvas.changeBrush(true)
 
-        color = "#0099CC"
-        currentColor = Color.parseColor(color)
+        updator.color = "#0099CC"
+        canvas.currentColor = Color.parseColor(updator.color)
         brushToolBtn.backgroundTintList = ContextCompat.getColorStateList(this, R.color.blue)
-        erase = false
+        canvas.erase = false
     }
     fun Green(view: View) {
-        changeBrush(true)
+        canvas.changeBrush(true)
 
-        color = "#669900"
-        currentColor = Color.parseColor(color)
+        updator.color = "#669900"
+        canvas.currentColor = Color.parseColor(updator.color)
         brushToolBtn.backgroundTintList = ContextCompat.getColorStateList(this, R.color.green)
-        erase = false
+        canvas.erase = false
     }
     fun Red(view: View) {
-        changeBrush(true)
+        canvas.changeBrush(true)
 
-        color = "#FF4444"
-        currentColor = Color.parseColor(color)
+        updator.color = "#FF4444"
+        canvas.currentColor = Color.parseColor(updator.color)
         brushToolBtn.backgroundTintList = ContextCompat.getColorStateList(this, R.color.red)
-        erase = false
+        canvas.erase = false
     }
     fun Purple(view: View) {
-        changeBrush(true)
+        canvas.changeBrush(true)
 
-        color = "#AA66CC"
-        currentColor = Color.parseColor(color)
+        updator.color = "#AA66CC"
+        canvas.currentColor = Color.parseColor(updator.color)
         brushToolBtn.backgroundTintList = ContextCompat.getColorStateList(this, R.color.purple)
-        erase = false
+        canvas.erase = false
     }
     fun Yellow(view: View) {
-        changeBrush(true)
+        canvas.changeBrush(true)
 
-        color = "#FFBB33"
-        currentColor = Color.parseColor(color)
+        updator.color = "#FFBB33"
+        canvas.currentColor = Color.parseColor(updator.color)
         brushToolBtn.backgroundTintList = ContextCompat.getColorStateList(this, R.color.yellow)
-        erase = false
+        canvas.erase = false
     }
 
     fun erase(view: View) {
-        changeBrush(true)
+        canvas.changeBrush(true)
 
-        color = "#FFFFFF"
-        currentColor = Color.parseColor(color)
+        updator.color = "#FFFFFF"
+        canvas.currentColor = Color.parseColor(updator.color)
         brushToolBtn.backgroundTintList = ContextCompat.getColorStateList(this, R.color.eraser)
-        erase = true
+        canvas.erase = true
     }
 
     fun configBrush(view: View) {
@@ -270,10 +270,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun getBitmapFromView(view: CanvasView, isSaving: Boolean): Bitmap{
         val bitmap = createBitmap(view.width, view.height, Bitmap.Config.ARGB_8888)
-        val canvas = Canvas(bitmap)
+        val canvasImage = Canvas(bitmap)
         if (isSaving)
-            canvas.drawColor(backgroundColor)
-        view.draw(canvas)
+            canvasImage.drawColor(canvas.backgroundColor)
+        view.draw(canvasImage)
         return bitmap
     }
 
@@ -315,45 +315,45 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun BgBlack(view: View) {
-        BgColor = "#000000"
-        backgroundColor = Color.BLACK
+        updator.BgColor = "#000000"
+        canvas.backgroundColor = Color.BLACK
         changeBgColor(R.color.black)
     }
     fun BgBlue(view: View) {
-        BgColor = "#0099CC"
-        backgroundColor = Color.parseColor(BgColor)
+        updator.BgColor = "#0099CC"
+        canvas.backgroundColor = Color.parseColor(updator.BgColor)
         changeBgColor(R.color.blue)
     }
     fun BgGreen(view: View) {
-        BgColor = "#669900"
-        backgroundColor = Color.parseColor(BgColor)
+        updator.BgColor = "#669900"
+        canvas.backgroundColor = Color.parseColor(updator.BgColor)
         changeBgColor(R.color.green)
     }
     fun BgRed(view: View) {
-        BgColor = "#FF4444"
-        backgroundColor = Color.parseColor(BgColor)
+        updator.BgColor = "#FF4444"
+        canvas.backgroundColor = Color.parseColor(updator.BgColor)
         changeBgColor(R.color.red)
     }
     fun BgPurple(view: View) {
-        BgColor = "#AA66CC"
-        backgroundColor = Color.parseColor(BgColor)
+        updator.BgColor = "#AA66CC"
+        canvas.backgroundColor = Color.parseColor(updator.BgColor)
         changeBgColor(R.color.purple)
     }
     fun BgYellow(view: View) {
-        BgColor = "#FFBB33"
-        backgroundColor = Color.parseColor(BgColor)
+        updator.BgColor = "#FFBB33"
+        canvas.backgroundColor = Color.parseColor(updator.BgColor)
         changeBgColor(R.color.yellow)
     }
 
     fun BgWhite(view: View) {
-        BgColor = "#FFFFFF"
-        backgroundColor = Color.WHITE
+        updator.BgColor = "#FFFFFF"
+        canvas.backgroundColor = Color.WHITE
         changeBgColor(R.color.eraser)
     }
 
     fun BgGray(view: View) {
-        BgColor = "#AAAAAA"
-        backgroundColor = Color.GRAY
+        updator.BgColor = "#AAAAAA"
+        canvas.backgroundColor = Color.GRAY
         changeBgColor(R.color.gray)
 
         println(R.color.gray.toString())
@@ -363,6 +363,17 @@ class MainActivity : AppCompatActivity() {
         bgColor = color
         backgroundToolBtn.backgroundTintList = ContextCompat.getColorStateList(this, color)
         backgroundExtraSpace.background = AppCompatResources.getDrawable(applicationContext, color)
+    }
+
+    override fun onDestroy() {
+//        val mActivityManager = this.getSystemService(ACTIVITY_SERVICE) as ActivityManager
+//        mActivityManager.killBackgroundProcesses("com.example.paintbuddy")
+        deleteCache(this)
+        this.cacheDir.deleteRecursively()
+        timer.cancel()
+        timer.purge();
+
+        super.onDestroy()
     }
 
 }

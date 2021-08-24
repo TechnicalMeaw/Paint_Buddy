@@ -7,21 +7,24 @@ import com.example.paintbuddy.updateDrawing.UpdateOperations.Companion.deleteNod
 import com.example.paintbuddy.updateDrawing.UpdateOperations.Companion.updateDrawInfo
 import com.example.paintbuddy.updateDrawing.UpdateOperations.Companion.updateNodeToDrawingInfo
 import com.example.paintbuddy.customClasses.CustomPath
-
+import javax.inject.Singleton
 
 class UploadDrawingInfo {
-    companion object{
         //For CustomPath
         var drawList : ArrayList<DrawItem> = ArrayList()
         var color = "#000000"
         var BgColor : String = "#FFFFFF"
 
-        fun addDrawInfoToFirebase(pathList: ArrayList<CustomPath>, stroke: Float, alpha: Int){
+
+        fun addDrawInfoToFirebase(pathList: ArrayList<CustomPath>, stroke: Float, alpha: Int, location: String = ""){
             val lSize = pathList.size
             val dSize = drawList.size
 
             if (dSize == 0 && lSize <3){
-                updateDrawInfo(drawList.toList())
+                /**
+                 * Clear the List
+                 * */
+                updateDrawInfo(drawList.toList(), location)
                 println("List Size Reduced to 0")
             }
 
@@ -29,7 +32,11 @@ class UploadDrawingInfo {
                 lSize == 0 ->{
                     println("List Size Reduced to 0")
                     drawList.clear()
-                    updateDrawInfo(drawList.toList())
+
+                    /**
+                     * Clear the List
+                     * */
+                    updateDrawInfo(drawList.toList(), location)
                 }
                 lSize == dSize -> {
                     println("List Size Same")
@@ -41,7 +48,7 @@ class UploadDrawingInfo {
                          * Updating the DrawItem
                          * A Index (dSize-1)
                          * */
-                        updateNodeToDrawingInfo(item, (dSize-1).toLong())
+                        updateNodeToDrawingInfo(item, (dSize-1).toLong(), location)
                     }
                 }
                 lSize < dSize -> {
@@ -51,7 +58,7 @@ class UploadDrawingInfo {
                         * At index (drawList.size -1)
                         * From Firebase Database
                         * */
-                        deleteNodeFromDrawInfo((drawList.size -1).toLong())
+                        deleteNodeFromDrawInfo((drawList.size -1).toLong(), location)
 
                         drawList.removeAt(drawList.size - 1)
                         println("List Size Reduced")
@@ -69,12 +76,11 @@ class UploadDrawingInfo {
                         * Adding the DrawItem
                         * To Firebase Database
                         * */
-                        addNodeToDrawingInfo(item, (n).toLong())
+                        addNodeToDrawingInfo(item, (n).toLong(), location)
                         println("List Size Increased")
                     }
                 }
             }
 
         }
-    }
 }

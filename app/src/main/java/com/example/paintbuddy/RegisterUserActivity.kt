@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.util.Patterns
 import android.view.View
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.drawable.toBitmap
 import com.bumptech.glide.Glide
@@ -43,8 +44,6 @@ class RegisterUserActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register_user)
-
-//        Glide.with(this).load(R.drawable.background_default).centerCrop().into(registerBg)
 
         phoneNumber = intent.getStringExtra(PHONE_NUMBER).toString()
         notificationToken = MyFirebaseMessagingService.token.toString()
@@ -111,16 +110,16 @@ class RegisterUserActivity : AppCompatActivity() {
     fun chooseDP(view: View) {
         val intent = Intent(Intent.ACTION_PICK)
         intent.type = "image/*"
-        startActivityForResult(intent, CHOOSE_IMAGE)
+        resultLauncher.launch(intent)
     }
 
 
-    var imageUri: Uri? = null
+    private var resultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            // There are no request codes
+            val data: Intent? = result.data
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == CHOOSE_IMAGE && resultCode == Activity.RESULT_OK && data != null){
-            imageUri = data.data
+            imageUri = data?.data
             circleImageView.setImageURI(imageUri)
             circleImageView.invalidate()
             val dr = circleImageView.drawable
@@ -128,6 +127,21 @@ class RegisterUserActivity : AppCompatActivity() {
             Glide.with(this).load(imageUri).into(circleImageView)
         }
     }
+
+
+    var imageUri: Uri? = null
+
+//    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+//        super.onActivityResult(requestCode, resultCode, data)
+//        if (requestCode == CHOOSE_IMAGE && resultCode == Activity.RESULT_OK && data != null){
+//            imageUri = data.data
+//            circleImageView.setImageURI(imageUri)
+//            circleImageView.invalidate()
+//            val dr = circleImageView.drawable
+//            imageBitmap = dr.toBitmap()
+//            Glide.with(this).load(imageUri).into(circleImageView)
+//        }
+//    }
 
     private fun validateEmail(emailForValidation: String): Boolean{
         return Patterns.EMAIL_ADDRESS.matcher(emailForValidation).matches()

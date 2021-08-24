@@ -7,21 +7,20 @@ import com.example.paintbuddy.constants.DatabaseLocations.Companion.SCREEN_RES_L
 import com.example.paintbuddy.firebaseClasses.DrawItem
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
+import javax.inject.Singleton
 
 class UpdateOperations {
     companion object{
-        var bgColor = R.color.eraser
-        var drawId = ""
 
-        private val drawRef = FirebaseDatabase.getInstance().getReference("$DRAWING_LOCATION/${FirebaseAuth.getInstance().uid}/$drawId")
-        fun updateDrawInfo(itemList: List<DrawItem>){
+        private val drawRef = FirebaseDatabase.getInstance().getReference("$DRAWING_LOCATION/${FirebaseAuth.getInstance().uid}/")
+        fun updateDrawInfo(itemList: List<DrawItem>, id: String){
             /**
             * If the list is empty then
             * First set the value of node to -1
             * And then update the empty list to delete all nodes
             */
             if (itemList.isEmpty()){
-                drawRef.child("0").setValue(-1)
+                drawRef.child(id).child("0").setValue(-1)
             }
 
             /**
@@ -32,8 +31,9 @@ class UpdateOperations {
             }
         }
 
-        private val drawPushRef = FirebaseDatabase.getInstance().getReference("$DRAWING_LOCATION/${FirebaseAuth.getInstance().uid}/$drawId").push()
-        fun addNodeToDrawingInfo(item: DrawItem, index: Long){
+
+        private val drawPushRef = FirebaseDatabase.getInstance().getReference("$DRAWING_LOCATION/${FirebaseAuth.getInstance().uid}/").push()
+        fun addNodeToDrawingInfo(item: DrawItem, index: Long, id: String){
             /**
             * Create a HashMap of Index
             * and DrawItem
@@ -44,29 +44,32 @@ class UpdateOperations {
             /**
             * Push the node to database
             */
-            drawPushRef.setValue(map).addOnSuccessListener {
+            drawPushRef.child(id).setValue(map).addOnSuccessListener {
                 Log.d("UpdateOperations", "Successfully added brushInfo value")
             }
         }
 
-        fun deleteNodeFromDrawInfo(index: Long){
+
+        fun deleteNodeFromDrawInfo(index: Long, id: String){
             /**
             * Delete the node at index
             * */
-            drawRef.child("$index").removeValue()
+            drawRef.child(id).child("$index").removeValue()
         }
 
-        fun updateNodeToDrawingInfo(item: DrawItem, index: Long){
+
+        fun updateNodeToDrawingInfo(item: DrawItem, index: Long, id: String){
             /**
             * Update the item to database
             * At the index position
             */
-            drawRef.child("$index").setValue(item).addOnSuccessListener {
+            drawRef.child(id).child("$index").setValue(item).addOnSuccessListener {
                 Log.d("UpdateOperations", "Successfully added brushInfo value")
             }
         }
 
-        private val scrRef = FirebaseDatabase.getInstance().getReference("$SCREEN_RES_LOCATION/${FirebaseAuth.getInstance().uid}/$drawId")
+
+        private val scrRef = FirebaseDatabase.getInstance().getReference("$SCREEN_RES_LOCATION/${FirebaseAuth.getInstance().uid}")
         fun updateScreenResolution(width: Int, height: Int){
             /**
             * Create a HashMap of
@@ -86,5 +89,6 @@ class UpdateOperations {
                 Log.d("UpdateOperations", "Successfully updated Screen Resolution")
             }
         }
+
     }
 }

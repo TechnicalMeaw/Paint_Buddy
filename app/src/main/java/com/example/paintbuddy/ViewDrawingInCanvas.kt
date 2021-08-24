@@ -39,7 +39,7 @@ class ViewDrawingInCanvas : AppCompatActivity() {
         if (data!= null && data.toString().length > 35){
             location = data.toString().substring(31)
             drawRef = FirebaseDatabase.getInstance().getReference("${DRAWING_LOCATION}/${location}/")
-            scrRef = FirebaseDatabase.getInstance().getReference("$SCREEN_RES_LOCATION/${location}/")
+            scrRef = FirebaseDatabase.getInstance().getReference("$SCREEN_RES_LOCATION/${location.substring(0,28)}/")
             Log.d("ViewDraw", "uri: $data, location: $location")
         }
 
