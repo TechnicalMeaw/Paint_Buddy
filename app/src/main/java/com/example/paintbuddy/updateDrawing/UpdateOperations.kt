@@ -10,7 +10,7 @@ import com.google.firebase.database.FirebaseDatabase
 import javax.inject.Singleton
 
 class UpdateOperations {
-    companion object{
+
 
         private val drawRef = FirebaseDatabase.getInstance().getReference("$DRAWING_LOCATION/${FirebaseAuth.getInstance().uid}/")
         fun updateDrawInfo(itemList: List<DrawItem>, id: String){
@@ -26,26 +26,32 @@ class UpdateOperations {
             /**
             * Update the list to the Node
             */
-            drawRef.setValue(itemList).addOnSuccessListener {
+            drawRef.child(id).setValue(itemList).addOnSuccessListener {
                 Log.d("UpdateOperations", "Successfully updated brushInfo value")
             }
         }
 
 
-        private val drawPushRef = FirebaseDatabase.getInstance().getReference("$DRAWING_LOCATION/${FirebaseAuth.getInstance().uid}/").push()
+//        private val drawPushRef = FirebaseDatabase.getInstance().getReference("$DRAWING_LOCATION/${FirebaseAuth.getInstance().uid}/")
         fun addNodeToDrawingInfo(item: DrawItem, index: Long, id: String){
             /**
             * Create a HashMap of Index
             * and DrawItem
             * */
-            val map : HashMap<Long, DrawItem> = HashMap()
-            map[index] = item
+//            val map : HashMap<Long, DrawItem> = HashMap()
+//            map[index] = item
+
+            println("List Size UpdateOperations Node Added: $drawRef")
 
             /**
             * Push the node to database
             */
-            drawPushRef.child(id).setValue(map).addOnSuccessListener {
+            drawRef.child(id).child("$index").setValue(item).addOnSuccessListener {
                 Log.d("UpdateOperations", "Successfully added brushInfo value")
+            }.addOnCanceledListener {
+                Log.d("UpdateOperations", "Canceled adding brushInfo value")
+            }.addOnFailureListener {
+                Log.d("UpdateOperations", "Canceled adding brushInfo value $it")
             }
         }
 
@@ -90,5 +96,5 @@ class UpdateOperations {
             }
         }
 
-    }
+
 }

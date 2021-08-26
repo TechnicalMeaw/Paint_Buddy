@@ -7,6 +7,9 @@ import android.os.Bundle
 import com.bumptech.glide.Glide
 import com.example.paintbuddy.constants.DatabaseLocations
 import com.example.paintbuddy.local.LocalStorage
+import com.google.firebase.FirebaseApp
+import com.google.firebase.appcheck.FirebaseAppCheck
+import com.google.firebase.appcheck.safetynet.SafetyNetAppCheckProviderFactory
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -18,6 +21,13 @@ class FlashScreenActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_flash_screen)
+
+        // App Check
+        FirebaseApp.initializeApp(/*context=*/this)
+        val firebaseAppCheck = FirebaseAppCheck.getInstance()
+        firebaseAppCheck.installAppCheckProviderFactory(
+            SafetyNetAppCheckProviderFactory.getInstance()
+        )
 
         LocalStorage.sharedPref = getSharedPreferences("sharedPref", Context.MODE_PRIVATE)
         checkStatus()

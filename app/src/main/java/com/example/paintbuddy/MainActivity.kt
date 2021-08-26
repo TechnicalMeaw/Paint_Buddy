@@ -23,15 +23,21 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import com.example.paintbuddy.CanvasView.flag
+import com.example.paintbuddy.constants.DatabaseLocations
 import com.example.paintbuddy.constants.IntentStrings.Companion.NEW_DRAW_ID
+import com.example.paintbuddy.firebaseClasses.DrawItem
 import com.example.paintbuddy.local.DeleteCache.deleteCache
+import com.example.paintbuddy.updateDrawing.UpdateOperations
 //import com.example.paintbuddy.updateDrawing.UpdateOperations.Companion.bgColor
-import com.example.paintbuddy.updateDrawing.UpdateOperations.Companion.updateScreenResolution
+//import com.example.paintbuddy.updateDrawing.UpdateOperations.Companion.updateScreenResolution
+import com.example.paintbuddy.updateDrawing.UpdateSavedDrawings.Companion.saveDrawing
 import com.example.paintbuddy.updateDrawing.UploadDrawingInfo
-//import com.example.paintbuddy.updateDrawing.UploadDrawingInfo.Companion.BgColor
-//import com.example.paintbuddy.updateDrawing.UploadDrawingInfo.Companion.addDrawInfoToFirebase
-//import com.example.paintbuddy.updateDrawing.UploadDrawingInfo.Companion.color
+import com.example.paintbuddy.updateDrawing.UploadDrawingInfo.Companion.addDrawInfoToFirebase
+import com.example.paintbuddy.updateDrawing.UploadDrawingInfo.Companion.BgColor
+import com.example.paintbuddy.updateDrawing.UploadDrawingInfo.Companion.color
+import com.example.paintbuddy.updateDrawing.UploadDrawingInfo.Companion.drawList
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.File
 import java.io.FileOutputStream
@@ -43,16 +49,15 @@ class MainActivity : AppCompatActivity() {
 
     private var drawingId = ""
     var bgColor = R.color.eraser
-    private lateinit var updator: UploadDrawingInfo
+    private val updater = UpdateOperations()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        updator = UploadDrawingInfo()
-
         if (intent.getStringExtra(NEW_DRAW_ID).toString() == "NEW"){
             drawingId = UUID.randomUUID().toString()
+            UploadDrawingInfo.init()
         }
 
         alphaSlider.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
@@ -85,7 +90,6 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-
         undoToolBtn.setOnClickListener {
             canvas.undo()
             canvas.invalidate()
@@ -108,13 +112,6 @@ class MainActivity : AppCompatActivity() {
         backgroundExtraSpace.background = AppCompatResources.getDrawable(applicationContext, bgColor)
 
 
-//        canvas.setOnTouchListener { view, motionEvent ->
-//
-//        }
-
-//        slider = findViewById<LinearLayout>(R.id.sliderWindow)
-//        bgColor = findViewById(R.id.backgroundColorPane)
-
         if (FirebaseAuth.getInstance().uid != null){
             update(drawingId)
         }
@@ -125,20 +122,17 @@ class MainActivity : AppCompatActivity() {
     private fun update(location: String){
         var pl = canvas.pathList.size
         var bgColor = canvas.backgroundColor
+
+        updater.updateScreenResolution(canvas.width, canvas.height)
+
         timer.scheduleAtFixedRate(
             timerTask {
 
                 if ((canvas.pathList.size != pl || canvas.backgroundColor != bgColor) && flag == false){
 
                     try {
-//                        if (backgroundColor != bgColor)
-//                            backgroundColorPane.visibility = View.GONE
 
-//                        if (pathList.size != pl)
-//                            sliderWindow.visibility = View.GONE
-
-                        updator.addDrawInfoToFirebase(canvas.pathList, canvas.currentStroke, canvas.currentAlpha, location)
-                        updateScreenResolution(canvas.width, canvas.height)
+                        addDrawInfoToFirebase(canvas.pathList, canvas.currentStroke, canvas.currentAlpha, location)
                         Log.d("MainActivity", "Updated Drawing :: Success")
 
                         pl = canvas.pathList.size
@@ -171,7 +165,7 @@ class MainActivity : AppCompatActivity() {
             R.id.redoBtn -> {
                 canvas.redo()
                 canvas.invalidate()
-                updator.addDrawInfoToFirebase(canvas.pathList, canvas.currentStroke, canvas.currentAlpha)
+                addDrawInfoToFirebase(canvas.pathList, canvas.currentStroke, canvas.currentAlpha)
             }
             R.id.clearBtn -> {
                 canvas.clear()
@@ -199,10 +193,11 @@ class MainActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
+
     fun Black(view: View) {
         canvas.changeBrush(true)
 
-        updator.color = "#000000"
+        color = "#000000"
         canvas.currentColor = Color.BLACK
         brushToolBtn.backgroundTintList = ContextCompat.getColorStateList(this, R.color.black)
         canvas.erase = false
@@ -210,40 +205,40 @@ class MainActivity : AppCompatActivity() {
     fun Blue(view: View) {
         canvas.changeBrush(true)
 
-        updator.color = "#0099CC"
-        canvas.currentColor = Color.parseColor(updator.color)
+        color = "#0099CC"
+        canvas.currentColor = Color.parseColor(color)
         brushToolBtn.backgroundTintList = ContextCompat.getColorStateList(this, R.color.blue)
         canvas.erase = false
     }
     fun Green(view: View) {
         canvas.changeBrush(true)
 
-        updator.color = "#669900"
-        canvas.currentColor = Color.parseColor(updator.color)
+        color = "#669900"
+        canvas.currentColor = Color.parseColor(color)
         brushToolBtn.backgroundTintList = ContextCompat.getColorStateList(this, R.color.green)
         canvas.erase = false
     }
     fun Red(view: View) {
         canvas.changeBrush(true)
 
-        updator.color = "#FF4444"
-        canvas.currentColor = Color.parseColor(updator.color)
+        color = "#FF4444"
+        canvas.currentColor = Color.parseColor(color)
         brushToolBtn.backgroundTintList = ContextCompat.getColorStateList(this, R.color.red)
         canvas.erase = false
     }
     fun Purple(view: View) {
         canvas.changeBrush(true)
 
-        updator.color = "#AA66CC"
-        canvas.currentColor = Color.parseColor(updator.color)
+        color = "#AA66CC"
+        canvas.currentColor = Color.parseColor(color)
         brushToolBtn.backgroundTintList = ContextCompat.getColorStateList(this, R.color.purple)
         canvas.erase = false
     }
     fun Yellow(view: View) {
         canvas.changeBrush(true)
 
-        updator.color = "#FFBB33"
-        canvas.currentColor = Color.parseColor(updator.color)
+        color = "#FFBB33"
+        canvas.currentColor = Color.parseColor(color)
         brushToolBtn.backgroundTintList = ContextCompat.getColorStateList(this, R.color.yellow)
         canvas.erase = false
     }
@@ -251,8 +246,8 @@ class MainActivity : AppCompatActivity() {
     fun erase(view: View) {
         canvas.changeBrush(true)
 
-        updator.color = "#FFFFFF"
-        canvas.currentColor = Color.parseColor(updator.color)
+        color = "#FFFFFF"
+        canvas.currentColor = Color.parseColor(color)
         brushToolBtn.backgroundTintList = ContextCompat.getColorStateList(this, R.color.eraser)
         canvas.erase = true
     }
@@ -311,48 +306,47 @@ class MainActivity : AppCompatActivity() {
         Handler().postDelayed({
             Toast.makeText(this, "Image saved at: DCIM/$albumName", Toast.LENGTH_LONG).show()
         }, 150)
-
     }
 
     fun BgBlack(view: View) {
-        updator.BgColor = "#000000"
+        BgColor = "#000000"
         canvas.backgroundColor = Color.BLACK
         changeBgColor(R.color.black)
     }
     fun BgBlue(view: View) {
-        updator.BgColor = "#0099CC"
-        canvas.backgroundColor = Color.parseColor(updator.BgColor)
+        BgColor = "#0099CC"
+        canvas.backgroundColor = Color.parseColor(BgColor)
         changeBgColor(R.color.blue)
     }
     fun BgGreen(view: View) {
-        updator.BgColor = "#669900"
-        canvas.backgroundColor = Color.parseColor(updator.BgColor)
+        BgColor = "#669900"
+        canvas.backgroundColor = Color.parseColor(BgColor)
         changeBgColor(R.color.green)
     }
     fun BgRed(view: View) {
-        updator.BgColor = "#FF4444"
-        canvas.backgroundColor = Color.parseColor(updator.BgColor)
+        BgColor = "#FF4444"
+        canvas.backgroundColor = Color.parseColor(BgColor)
         changeBgColor(R.color.red)
     }
     fun BgPurple(view: View) {
-        updator.BgColor = "#AA66CC"
-        canvas.backgroundColor = Color.parseColor(updator.BgColor)
+        BgColor = "#AA66CC"
+        canvas.backgroundColor = Color.parseColor(BgColor)
         changeBgColor(R.color.purple)
     }
     fun BgYellow(view: View) {
-        updator.BgColor = "#FFBB33"
-        canvas.backgroundColor = Color.parseColor(updator.BgColor)
+        BgColor = "#FFBB33"
+        canvas.backgroundColor = Color.parseColor(BgColor)
         changeBgColor(R.color.yellow)
     }
 
     fun BgWhite(view: View) {
-        updator.BgColor = "#FFFFFF"
+        BgColor = "#FFFFFF"
         canvas.backgroundColor = Color.WHITE
         changeBgColor(R.color.eraser)
     }
 
     fun BgGray(view: View) {
-        updator.BgColor = "#AAAAAA"
+        BgColor = "#AAAAAA"
         canvas.backgroundColor = Color.GRAY
         changeBgColor(R.color.gray)
 
@@ -365,15 +359,20 @@ class MainActivity : AppCompatActivity() {
         backgroundExtraSpace.background = AppCompatResources.getDrawable(applicationContext, color)
     }
 
-    override fun onDestroy() {
-//        val mActivityManager = this.getSystemService(ACTIVITY_SERVICE) as ActivityManager
-//        mActivityManager.killBackgroundProcesses("com.example.paintbuddy")
-        deleteCache(this)
-        this.cacheDir.deleteRecursively()
-        timer.cancel()
-        timer.purge();
 
+
+
+
+
+    override fun onDestroy() {
+        timer.cancel()
+        timer.purge()
+
+        Thread{
+            saveDrawing(drawingId, getBitmapFromView(canvas, true), "Untitled")
+        }.start()
         super.onDestroy()
     }
+
 
 }

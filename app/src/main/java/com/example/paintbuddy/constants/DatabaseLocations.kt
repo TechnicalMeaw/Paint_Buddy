@@ -5,5 +5,6 @@ class DatabaseLocations {
         const val USERINFO_LOCATION = "/users"
         const val DRAWING_LOCATION = "/DrawInfo"
         const val SCREEN_RES_LOCATION = "/ScreenRes"
+        const val SAVED_DRAWINGS = "/SavedDrawings"
     }
 }
