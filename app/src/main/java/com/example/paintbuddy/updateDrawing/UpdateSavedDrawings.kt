@@ -1,7 +1,11 @@
 package com.example.paintbuddy.updateDrawing
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.util.Log
+import android.widget.Toast
+import com.example.paintbuddy.constants.DatabaseLocations
+import com.example.paintbuddy.constants.DatabaseLocations.Companion.DRAWING_LOCATION
 import com.example.paintbuddy.constants.DatabaseLocations.Companion.SAVED_DRAWINGS
 import com.example.paintbuddy.constants.StorageLocations.Companion.SAVED_DRAWING_THUMB
 import com.example.paintbuddy.firebaseClasses.SavedItem
@@ -23,7 +27,7 @@ class UpdateSavedDrawings {
 
         private fun uploadThumbnail(bitmap: Bitmap, id : String, title: String){
             val ref = FirebaseStorage.getInstance().getReference("$SAVED_DRAWING_THUMB/$id")
-            val thumb = ImageResizer.generateThumb(bitmap, 25000)
+            val thumb = ImageResizer.generateThumb(bitmap, 120000)
             ref.putBytes(bitmapToByteArray(thumb)).addOnSuccessListener {
                 Log.d("SaveDrawing", "Uploaded thumbnail :: success")
 
@@ -47,6 +51,32 @@ class UpdateSavedDrawings {
             bitmap.compress(Bitmap.CompressFormat.JPEG, 90, stream)
 
             return stream.toByteArray()
+        }
+
+
+
+        fun updateSavedDrawingTitle(context: Context, newTitle: String, drawItem: SavedItem) {
+            val saveToRef = FirebaseDatabase.getInstance().getReference("${DatabaseLocations.SAVED_DRAWINGS}/${drawItem.userId}/").child(drawItem.drawId)
+            saveToRef.child("title").setValue(newTitle).addOnSuccessListener {
+                Toast.makeText(context, "Rename Successful", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        fun deleteDrawing(context: Context, drawItem: SavedItem){
+            val saveToRef = FirebaseDatabase.getInstance().getReference("${DatabaseLocations.SAVED_DRAWINGS}/${drawItem.userId}/").child(drawItem.drawId)
+            val drawRef = FirebaseDatabase.getInstance().getReference("$DRAWING_LOCATION/${drawItem.userId}/").child(drawItem.drawId)
+
+            val thumbRef = FirebaseStorage.getInstance().getReferenceFromUrl(drawItem.thumbUri)
+
+            Thread{
+                drawRef.removeValue().addOnSuccessListener {
+                    saveToRef.removeValue().addOnSuccessListener {
+                        thumbRef.delete().addOnSuccessListener {
+                            Toast.makeText(context, "Deleted", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+            }.start()
         }
     }
 }

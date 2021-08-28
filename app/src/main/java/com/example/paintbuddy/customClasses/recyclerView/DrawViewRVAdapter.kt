@@ -2,10 +2,12 @@ package com.example.paintbuddy.customClasses.recyclerView
 
 import android.content.Context
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
@@ -23,6 +25,7 @@ class DrawViewRVAdapter(val context: Context, private val listener: DrawListener
         val thumb : ImageView = itemView.findViewById(R.id.drawThumbImageView)
         val title : TextView = itemView.findViewById(R.id.drawTitleView)
         val date : TextView = itemView.findViewById(R.id.modifiedDateView)
+        val toolbar : Toolbar = itemView.findViewById(R.id.drawToolBar)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DrawingViewHolder {
@@ -30,6 +33,8 @@ class DrawViewRVAdapter(val context: Context, private val listener: DrawListener
         viewHolder.thumb.setOnClickListener {
             listener.onDrawItemClicked(allDrawings[viewHolder.bindingAdapterPosition])
         }
+        viewHolder.toolbar.inflateMenu(R.menu.saved_item_menu)
+
         return viewHolder
     }
 
@@ -43,6 +48,30 @@ class DrawViewRVAdapter(val context: Context, private val listener: DrawListener
 
         holder.title.text = currentDrawing.title
         holder.date.text = getDate(currentDrawing.lastModified)
+        holder.toolbar.setOnMenuItemClickListener( object : MenuItem.OnMenuItemClickListener,
+            Toolbar.OnMenuItemClickListener {
+
+            override fun onMenuItemClick(item: MenuItem?): Boolean {
+                when(item?.itemId){
+                    R.id.viewSavedItemBtn -> {
+                        listener.onSavedMenuViewBtnClicked(allDrawings[holder.bindingAdapterPosition])
+                    }
+                    R.id.editSavedItemBtn -> {
+                        listener.onSavedMenuEditBtnClicked(allDrawings[holder.bindingAdapterPosition])
+                    }
+                    R.id.shareSavedItemBtn -> {
+                        listener.onSavedMenuShareBtnClicked(allDrawings[holder.bindingAdapterPosition])
+                    }
+                    R.id.renameSavedItemBtn -> {
+                        listener.onSavedMenuRenameBtnClicked(allDrawings[holder.bindingAdapterPosition])
+                    }
+                    R.id.deleteSavedItem -> {
+                        listener.onSavedMenuDeleteBtnClicked(allDrawings[holder.bindingAdapterPosition])
+                    }
+                }
+                return true
+            }
+        })
     }
 
 
@@ -61,4 +90,9 @@ class DrawViewRVAdapter(val context: Context, private val listener: DrawListener
 
 interface DrawListener{
     fun onDrawItemClicked(drawItem: SavedItem)
+    fun onSavedMenuViewBtnClicked(drawItem: SavedItem)
+    fun onSavedMenuEditBtnClicked(drawItem: SavedItem)
+    fun onSavedMenuShareBtnClicked(drawItem: SavedItem)
+    fun onSavedMenuRenameBtnClicked(drawItem: SavedItem)
+    fun onSavedMenuDeleteBtnClicked(drawItem: SavedItem)
 }

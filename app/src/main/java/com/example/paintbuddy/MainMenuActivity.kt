@@ -1,18 +1,23 @@
 package com.example.paintbuddy
 
+import android.content.DialogInterface
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.text.InputType
+import android.widget.EditText
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
-
 import com.example.paintbuddy.constants.DatabaseLocations.Companion.SAVED_DRAWINGS
 
 import com.example.paintbuddy.constants.IntentStrings.Companion.NEW_DRAW_ID
+import com.example.paintbuddy.constants.IntentStrings.Companion.SAVED_DRAWING_LOCATION
 import com.example.paintbuddy.customClasses.recyclerView.DrawListener
 import com.example.paintbuddy.customClasses.recyclerView.DrawViewRVAdapter
+import com.example.paintbuddy.dialogBox.RenameBox.Companion.showRenameDialog
 import com.example.paintbuddy.firebaseClasses.SavedItem
+import com.example.paintbuddy.updateDrawing.UpdateSavedDrawings.Companion.deleteDrawing
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import kotlinx.android.synthetic.main.activity_main_menu.*
@@ -43,7 +48,48 @@ class MainMenuActivity : AppCompatActivity(), DrawListener {
     }
 
     override fun onDrawItemClicked(drawItem: SavedItem) {
-        Toast.makeText(this, drawItem.drawId, Toast.LENGTH_SHORT).show()
+        try {
+            val intent = Intent(this, ViewDrawingInCanvas::class.java)
+            intent.putExtra(SAVED_DRAWING_LOCATION, "${drawItem.userId}/${drawItem.drawId}")
+            startActivity(intent)
+        }catch (e:Exception){
+            e.stackTrace
+        }
+    }
+
+    override fun onSavedMenuViewBtnClicked(drawItem: SavedItem) {
+        try {
+            val intent = Intent(this, ViewDrawingInCanvas::class.java)
+            intent.putExtra(SAVED_DRAWING_LOCATION, "${drawItem.userId}/${drawItem.drawId}")
+            startActivity(intent)
+        }catch (e:Exception){
+            e.stackTrace
+        }
+
+    }
+
+    override fun onSavedMenuEditBtnClicked(drawItem: SavedItem) {
+        val intent = Intent(this, MainActivity::class.java)
+        intent.putExtra(NEW_DRAW_ID, "${drawItem.userId} ${drawItem.drawId} ${drawItem.thumbUri}")
+        startActivity(intent)
+    }
+
+    override fun onSavedMenuShareBtnClicked(drawItem: SavedItem) {
+        val sendIntent: Intent = Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_TEXT, "https://paintbuddy.com/drawing/${drawItem.userId}/${drawItem.drawId}")
+            type = "text/plain"
+        }
+        val shareIntent = Intent.createChooser(sendIntent, null)
+        startActivity(shareIntent)
+    }
+
+    override fun onSavedMenuRenameBtnClicked(drawItem: SavedItem) {
+        showRenameDialog(this, drawItem)
+    }
+
+    override fun onSavedMenuDeleteBtnClicked(drawItem: SavedItem) {
+        deleteDrawing(this, drawItem)
     }
 
 
@@ -55,22 +101,22 @@ class MainMenuActivity : AppCompatActivity(), DrawListener {
                 if (snapshot.exists()){
                     val item = snapshot.getValue(SavedItem ::class.java)
                     hashMap[snapshot.key.toString()] = item!!
-                    adapter.updateList(hashMap.values.toList().sortedBy { it.lastModified })
+                    adapter.updateList(hashMap.values.toList().sortedBy { it.lastModified }.reversed())
                 }
             }
 
             override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
                 if (snapshot.exists()){
-                    val item = snapshot.value as SavedItem
-                    hashMap[snapshot.key.toString()] = item
-                    adapter.updateList(hashMap.values.toList().sortedBy { it.lastModified })
+                    val item = snapshot.getValue(SavedItem ::class.java)
+                    hashMap[snapshot.key.toString()] = item!!
+                    adapter.updateList(hashMap.values.toList().sortedBy { it.lastModified }.reversed())
                 }
             }
 
             override fun onChildRemoved(snapshot: DataSnapshot) {
                 if (snapshot.exists()){
                     hashMap.remove(snapshot.key.toString())
-                    adapter.updateList(hashMap.values.toList().sortedBy { it.lastModified })
+                    adapter.updateList(hashMap.values.toList().sortedBy { it.lastModified }.reversed())
                 }
             }
 
@@ -84,4 +130,5 @@ class MainMenuActivity : AppCompatActivity(), DrawListener {
 
         })
     }
+
 }

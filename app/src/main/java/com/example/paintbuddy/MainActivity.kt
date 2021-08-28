@@ -7,6 +7,7 @@ import android.graphics.Bitmap
 import android.graphics.Bitmap.createBitmap
 import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.Paint
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
@@ -24,7 +25,10 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import com.example.paintbuddy.CanvasView.flag
 import com.example.paintbuddy.constants.DatabaseLocations
+import com.example.paintbuddy.constants.DatabaseLocations.Companion.DRAWING_LOCATION
 import com.example.paintbuddy.constants.IntentStrings.Companion.NEW_DRAW_ID
+import com.example.paintbuddy.conversion.StringConversions
+import com.example.paintbuddy.customClasses.CustomPaint
 import com.example.paintbuddy.firebaseClasses.DrawItem
 import com.example.paintbuddy.local.DeleteCache.deleteCache
 import com.example.paintbuddy.updateDrawing.UpdateOperations
@@ -37,6 +41,9 @@ import com.example.paintbuddy.updateDrawing.UploadDrawingInfo.Companion.BgColor
 import com.example.paintbuddy.updateDrawing.UploadDrawingInfo.Companion.color
 import com.example.paintbuddy.updateDrawing.UploadDrawingInfo.Companion.drawList
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.ChildEventListener
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.File
@@ -51,13 +58,24 @@ class MainActivity : AppCompatActivity() {
     var bgColor = R.color.eraser
     private val updater = UpdateOperations()
 
+    private var drawId = ""
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        if (intent.getStringExtra(NEW_DRAW_ID).toString() == "NEW"){
+        drawId = intent.getStringExtra(NEW_DRAW_ID).toString()
+
+        if (drawId == "NEW"){
             drawingId = UUID.randomUUID().toString()
             UploadDrawingInfo.init()
+        }else{
+            val credentials = drawId.split(" ")
+            drawingId = credentials[1]
+            Thread{
+                retrieveSavedDrawing(credentials)
+            }.start()
+
         }
 
         alphaSlider.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
@@ -112,9 +130,68 @@ class MainActivity : AppCompatActivity() {
         backgroundExtraSpace.background = AppCompatResources.getDrawable(applicationContext, bgColor)
 
 
-        if (FirebaseAuth.getInstance().uid != null){
+        if (drawId == "NEW" && FirebaseAuth.getInstance().uid != null){
             update(drawingId)
         }
+    }
+
+    private fun retrieveSavedDrawing(list: List<String>) {
+        val ref = FirebaseDatabase.getInstance().getReference("$DRAWING_LOCATION/${list[0]}/${list[1]}")
+        ref.addChildEventListener(object: ChildEventListener{
+            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+                if (snapshot.exists()){
+                    try {
+                        val item = snapshot.getValue(DrawItem::class.java)
+                        UploadDrawingInfo.drawList.add(item!!)
+                        val path = snapshot.child("drawPath").value as String
+                        canvas.pathList.add(StringConversions.convertStringToPath(path))
+                        canvas.brushList.add(brushInit(item.BrushColor, item.BrushStroke, item.BrushAlpha))
+                        BgColor = item.BgColor
+                        canvas.backgroundColor = Color.parseColor(BgColor)
+                        canvas.invalidate()
+                    }catch (e: Exception){
+                        Log.e("MainActivity", "$e")
+                    }
+
+                }
+            }
+
+            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
+//                if (snapshot.exists()) {
+//                    val item = snapshot.getValue(DrawItem::class.java)
+//                    drawList[snapshot.key!!.toInt()] = item!!
+//                    canvas.pathList[snapshot.key!!.toInt()] = StringConversions.convertStringToPath(item!!.DrawPath)
+//                    canvas.brushList.add(brushInit(item.BrushColor, item.BrushStroke, item.BrushAlpha))
+//                    BgColor = item.BgColor
+//                    canvas.backgroundColor = Color.parseColor(BgColor)
+//                }
+                ref.removeEventListener(this)
+            }
+
+            override fun onChildRemoved(snapshot: DataSnapshot) {
+                println("Child Removed")
+            }
+
+            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
+                TODO("Not yet implemented")
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                TODO("Not yet implemented")
+            }
+
+        })
+    }
+
+    private fun brushInit(color: String, stroke: Float, alpha: Int): CustomPaint {
+        val brush = CustomPaint()
+        brush.isAntiAlias = true
+        brush.style = Paint.Style.STROKE
+        brush.strokeJoin = Paint.Join.ROUND
+        brush.strokeWidth = stroke
+        brush.color = Color.parseColor(color)
+        brush.alpha = alpha
+        return brush
     }
 
 
@@ -123,7 +200,6 @@ class MainActivity : AppCompatActivity() {
         var pl = canvas.pathList.size
         var bgColor = canvas.backgroundColor
 
-        updater.updateScreenResolution(canvas.width, canvas.height)
 
         timer.scheduleAtFixedRate(
             timerTask {
@@ -133,6 +209,7 @@ class MainActivity : AppCompatActivity() {
                     try {
 
                         addDrawInfoToFirebase(canvas.pathList, canvas.currentStroke, canvas.currentAlpha, location)
+                        updater.updateScreenResolution(canvas.width, canvas.height)
                         Log.d("MainActivity", "Updated Drawing :: Success")
 
                         pl = canvas.pathList.size
@@ -368,9 +445,11 @@ class MainActivity : AppCompatActivity() {
         timer.cancel()
         timer.purge()
 
-        Thread{
-            saveDrawing(drawingId, getBitmapFromView(canvas, true), "Untitled")
-        }.start()
+        if (drawId == "NEW" && canvas.pathList.size > 0){
+            Thread{
+                saveDrawing(drawingId, getBitmapFromView(canvas, true), "Untitled")
+            }.start()
+        }
         super.onDestroy()
     }
 

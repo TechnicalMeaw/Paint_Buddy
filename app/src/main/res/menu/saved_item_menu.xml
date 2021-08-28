@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/viewSavedItemBtn"
+        android:title="@string/view"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/editSavedItemBtn"
+        android:title="@string/edit"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/shareSavedItemBtn"
+        android:title="@string/share"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/renameSavedItemBtn"
+        android:title="@string/rename"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/deleteSavedItem"
+        android:title="@string/delete"
+        app:showAsAction="never"/>
+
+</menu>

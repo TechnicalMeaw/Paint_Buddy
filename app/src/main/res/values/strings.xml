@@ -2,4 +2,9 @@
     <string name="app_name">Paint Buddy</string>
     <string name="resend"><u>Resend</u></string>
     <string name="not_you"><u>Not you?</u></string>
+    <string name="view">View</string>
+    <string name="edit">Edit</string>
+    <string name="share">Share</string>
+    <string name="rename">Rename</string>
+    <string name="delete">Delete</string>
 </resources>

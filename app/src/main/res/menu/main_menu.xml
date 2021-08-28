@@ -12,7 +12,7 @@
     <item
         android:id="@+id/saveBtn"
         android:icon="@drawable/ic_baseline_save_24"
-        android:title="Save"
+        android:title="Save as PNG"
         app:showAsAction="ifRoom" />
 
     <item

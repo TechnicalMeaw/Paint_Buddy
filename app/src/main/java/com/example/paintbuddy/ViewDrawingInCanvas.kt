@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.paintbuddy.constants.DatabaseLocations
 import com.example.paintbuddy.constants.DatabaseLocations.Companion.DRAWING_LOCATION
 import com.example.paintbuddy.constants.DatabaseLocations.Companion.SCREEN_RES_LOCATION
+import com.example.paintbuddy.constants.IntentStrings.Companion.SAVED_DRAWING_LOCATION
 import com.example.paintbuddy.conversion.StringConversions.Companion.convertStringToPath
 import com.example.paintbuddy.customClasses.CustomPaint
 import com.example.paintbuddy.customClasses.CustomPath
@@ -34,14 +35,16 @@ class ViewDrawingInCanvas : AppCompatActivity() {
         setContentView(R.layout.activity_view_drawing_in_canvas)
 
 
-
         val data: Uri? = intent.data
-        if (data!= null && data.toString().length > 35){
-            location = data.toString().substring(31)
-            drawRef = FirebaseDatabase.getInstance().getReference("${DRAWING_LOCATION}/${location}/")
-            scrRef = FirebaseDatabase.getInstance().getReference("$SCREEN_RES_LOCATION/${location.substring(0,28)}/")
-            Log.d("ViewDraw", "uri: $data, location: $location")
+        location = if (data!= null && data.toString().length > 75){
+            data.toString().substring(31)
+        }else {
+            intent.getStringExtra(SAVED_DRAWING_LOCATION).toString()
         }
+
+        drawRef = FirebaseDatabase.getInstance().getReference("${DRAWING_LOCATION}/${location}/")
+        scrRef = FirebaseDatabase.getInstance().getReference("$SCREEN_RES_LOCATION/${location.substring(0,28)}/")
+        Log.d("ViewDraw", "uri: $data, location: $location")
 
 
         getScreenRes(viewDrawingCanvas)
@@ -68,7 +71,7 @@ class ViewDrawingInCanvas : AppCompatActivity() {
     private fun updateCanvas(view: ImageView){
         drawRef.addChildEventListener(object : ChildEventListener{
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
-                if (snapshot.value != null) {
+                if (snapshot.exists()) {
                     getScreenRes(viewDrawingCanvas)
                     try {
                         val path = snapshot.child("drawPath").value as String
@@ -90,6 +93,8 @@ class ViewDrawingInCanvas : AppCompatActivity() {
                         println(e)
                     }
                     updateCanvas(drawMap, brushColorMap, view)
+                }else{
+                    Toast.makeText(this@ViewDrawingInCanvas, "Link Expired", Toast.LENGTH_SHORT).show()
                 }
 
             }
