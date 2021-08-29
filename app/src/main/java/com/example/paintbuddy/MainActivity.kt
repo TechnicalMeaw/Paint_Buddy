@@ -24,14 +24,18 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import com.example.paintbuddy.CanvasView.flag
+import com.example.paintbuddy.constants.ColorMap
 import com.example.paintbuddy.constants.DatabaseLocations
 import com.example.paintbuddy.constants.DatabaseLocations.Companion.DRAWING_LOCATION
 import com.example.paintbuddy.constants.IntentStrings.Companion.NEW_DRAW_ID
+import com.example.paintbuddy.constants.StorageLocations
 import com.example.paintbuddy.conversion.StringConversions
 import com.example.paintbuddy.customClasses.CustomPaint
 import com.example.paintbuddy.firebaseClasses.DrawItem
+import com.example.paintbuddy.imageOperations.ImageResizer
 import com.example.paintbuddy.local.DeleteCache.deleteCache
 import com.example.paintbuddy.updateDrawing.UpdateOperations
+import com.example.paintbuddy.updateDrawing.UpdateSavedDrawings.Companion.bitmapToByteArray
 //import com.example.paintbuddy.updateDrawing.UpdateOperations.Companion.bgColor
 //import com.example.paintbuddy.updateDrawing.UpdateOperations.Companion.updateScreenResolution
 import com.example.paintbuddy.updateDrawing.UpdateSavedDrawings.Companion.saveDrawing
@@ -45,6 +49,7 @@ import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.storage.FirebaseStorage
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.File
 import java.io.FileOutputStream
@@ -59,6 +64,7 @@ class MainActivity : AppCompatActivity() {
     private val updater = UpdateOperations()
 
     private var drawId = ""
+    lateinit var credentials : List<String>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,7 +76,7 @@ class MainActivity : AppCompatActivity() {
             drawingId = UUID.randomUUID().toString()
             UploadDrawingInfo.init()
         }else{
-            val credentials = drawId.split(" ")
+            credentials = drawId.split(" ")
             drawingId = credentials[1]
             Thread{
                 retrieveSavedDrawing(credentials)
@@ -137,39 +143,52 @@ class MainActivity : AppCompatActivity() {
 
     private fun retrieveSavedDrawing(list: List<String>) {
         val ref = FirebaseDatabase.getInstance().getReference("$DRAWING_LOCATION/${list[0]}/${list[1]}")
+        val count = list[3].toInt()
+        UploadDrawingInfo.init()
+
         ref.addChildEventListener(object: ChildEventListener{
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+
                 if (snapshot.exists()){
                     try {
                         val item = snapshot.getValue(DrawItem::class.java)
-                        UploadDrawingInfo.drawList.add(item!!)
-                        val path = snapshot.child("drawPath").value as String
-                        canvas.pathList.add(StringConversions.convertStringToPath(path))
-                        canvas.brushList.add(brushInit(item.BrushColor, item.BrushStroke, item.BrushAlpha))
-                        BgColor = item.BgColor
-                        canvas.backgroundColor = Color.parseColor(BgColor)
-                        canvas.invalidate()
+                        if (item != null) {
+                            drawList.add(item)
+                            val pathStr = snapshot.child("drawPath").value as String
+
+                            canvas.pathList.add(StringConversions.convertStringToPath(pathStr))
+                            val color = snapshot.child("brushColor").value as String
+                            val stroke = snapshot.child("brushStroke").value as Long
+                            val alpha = snapshot.child("brushAlpha").value as Long
+
+                            val brush = brushInit(color, stroke.toFloat(), alpha.toInt())
+                            canvas.brushList.add(brush)
+
+                            BgColor = snapshot.child("bgColor").value as String
+
+                            canvas.backgroundColor = Color.parseColor(BgColor)
+                            ColorMap.map[BgColor]?.let { changeBgColor(it) }
+
+                            canvas.invalidate()
+
+                            if (snapshot.key!!.toInt() >= count - 1){
+                                ref.removeEventListener(this)
+                                update(list[1])
+                            }
+                        }
                     }catch (e: Exception){
                         Log.e("MainActivity", "$e")
                     }
-
                 }
             }
 
             override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
-//                if (snapshot.exists()) {
-//                    val item = snapshot.getValue(DrawItem::class.java)
-//                    drawList[snapshot.key!!.toInt()] = item!!
-//                    canvas.pathList[snapshot.key!!.toInt()] = StringConversions.convertStringToPath(item!!.DrawPath)
-//                    canvas.brushList.add(brushInit(item.BrushColor, item.BrushStroke, item.BrushAlpha))
-//                    BgColor = item.BgColor
-//                    canvas.backgroundColor = Color.parseColor(BgColor)
-//                }
                 ref.removeEventListener(this)
             }
 
             override fun onChildRemoved(snapshot: DataSnapshot) {
                 println("Child Removed")
+                ref.removeEventListener(this)
             }
 
             override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
@@ -195,7 +214,7 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    var timer = Timer()
+    private var timer = Timer()
     private fun update(location: String){
         var pl = canvas.pathList.size
         var bgColor = canvas.backgroundColor
@@ -445,13 +464,46 @@ class MainActivity : AppCompatActivity() {
         timer.cancel()
         timer.purge()
 
-        if (drawId == "NEW" && canvas.pathList.size > 0){
-            Thread{
-                saveDrawing(drawingId, getBitmapFromView(canvas, true), "Untitled")
-            }.start()
-        }
+        Thread{
+            if (drawId == "NEW" && canvas.pathList.size > 0){
+                saveDrawing(drawingId, getBitmapFromView(canvas, true), "Untitled", drawList.size.toLong())
+            }else{
+                try{
+                    updateSavedDrawing(drawList.size, credentials[0], credentials[1], credentials[2])
+                }catch (e: Exception){
+                    e.stackTrace
+                }
+            }
+        }.start()
         super.onDestroy()
     }
 
+    private fun updateSavedDrawing(childCount: Int, userId: String, drawingId: String, thumb: String){
+        val updateSaveToRef = FirebaseDatabase.getInstance().getReference(DatabaseLocations.SAVED_DRAWINGS).child(userId).child(drawingId)
+        updateSaveToRef.child("nodeCount").setValue(childCount).addOnSuccessListener {
+            println("Node Count Updated")
+        }
+        updateSaveToRef.child("lastModified").setValue(System.currentTimeMillis()).addOnSuccessListener {
+            println("Last Modified Date Updated")
+        }
+        if (thumb != ""){
+            val oldThumbRef = FirebaseStorage.getInstance().getReferenceFromUrl(thumb)
+
+            val newBitmap = getBitmapFromView(canvas, true)
+            val newThumbBitmap = ImageResizer.generateThumb(newBitmap, 120000)
+            val ref = FirebaseStorage.getInstance().getReference("${StorageLocations.SAVED_DRAWING_THUMB}/${UUID.randomUUID()}")
+
+            ref.putBytes(bitmapToByteArray(newThumbBitmap)).addOnSuccessListener {
+                ref.downloadUrl.addOnSuccessListener{
+                    updateSaveToRef.child("thumbUri").setValue("$it").addOnSuccessListener {
+                        oldThumbRef.delete().addOnSuccessListener {
+                            println("Thumbnail Updated")
+                        }
+                    }
+                }
+            }
+        }
+
+    }
 
 }

@@ -70,7 +70,7 @@ class MainMenuActivity : AppCompatActivity(), DrawListener {
 
     override fun onSavedMenuEditBtnClicked(drawItem: SavedItem) {
         val intent = Intent(this, MainActivity::class.java)
-        intent.putExtra(NEW_DRAW_ID, "${drawItem.userId} ${drawItem.drawId} ${drawItem.thumbUri}")
+        intent.putExtra(NEW_DRAW_ID, "${drawItem.userId} ${drawItem.drawId} ${drawItem.thumbUri} ${drawItem.nodeCount}")
         startActivity(intent)
     }
 
