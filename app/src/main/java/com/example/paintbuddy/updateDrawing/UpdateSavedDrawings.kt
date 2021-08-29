@@ -7,6 +7,7 @@ import android.widget.Toast
 import com.example.paintbuddy.constants.DatabaseLocations
 import com.example.paintbuddy.constants.DatabaseLocations.Companion.DRAWING_LOCATION
 import com.example.paintbuddy.constants.DatabaseLocations.Companion.SAVED_DRAWINGS
+import com.example.paintbuddy.constants.StorageLocations
 import com.example.paintbuddy.constants.StorageLocations.Companion.SAVED_DRAWING_THUMB
 import com.example.paintbuddy.firebaseClasses.SavedItem
 import com.example.paintbuddy.imageOperations.ImageResizer
@@ -14,7 +15,9 @@ import com.google.firebase.auth.FirebaseAuth
 
 import com.google.firebase.database.*
 import com.google.firebase.storage.FirebaseStorage
+import kotlinx.android.synthetic.main.activity_main.*
 import java.io.ByteArrayOutputStream
+import java.util.*
 
 
 class UpdateSavedDrawings {
@@ -62,11 +65,11 @@ class UpdateSavedDrawings {
             }
         }
 
-        fun deleteDrawing(context: Context, drawItem: SavedItem){
-            val saveToRef = FirebaseDatabase.getInstance().getReference("${DatabaseLocations.SAVED_DRAWINGS}/${drawItem.userId}/").child(drawItem.drawId)
-            val drawRef = FirebaseDatabase.getInstance().getReference("$DRAWING_LOCATION/${drawItem.userId}/").child(drawItem.drawId)
+        fun deleteDrawing(context: Context, userId: String, drawingId: String, thumbUri: String){
+            val saveToRef = FirebaseDatabase.getInstance().getReference("${DatabaseLocations.SAVED_DRAWINGS}/${userId}/").child(drawingId)
+            val drawRef = FirebaseDatabase.getInstance().getReference("$DRAWING_LOCATION/${userId}/").child(drawingId)
 
-            val thumbRef = FirebaseStorage.getInstance().getReferenceFromUrl(drawItem.thumbUri)
+            val thumbRef = FirebaseStorage.getInstance().getReferenceFromUrl(thumbUri)
 
             Thread{
                 drawRef.removeValue().addOnSuccessListener {
@@ -77,6 +80,33 @@ class UpdateSavedDrawings {
                     }
                 }
             }.start()
+        }
+
+        fun updateSavedDrawing(childCount: Int, userId: String, drawingId: String, thumb: String, newBitmap: Bitmap){
+            val updateSaveToRef = FirebaseDatabase.getInstance().getReference(DatabaseLocations.SAVED_DRAWINGS).child(userId).child(drawingId)
+            updateSaveToRef.child("nodeCount").setValue(childCount).addOnSuccessListener {
+                println("Node Count Updated")
+            }
+            updateSaveToRef.child("lastModified").setValue(System.currentTimeMillis()).addOnSuccessListener {
+                println("Last Modified Date Updated")
+            }
+            if (thumb != ""){
+                val oldThumbRef = FirebaseStorage.getInstance().getReferenceFromUrl(thumb)
+
+                val newThumbBitmap = ImageResizer.generateThumb(newBitmap, 120000)
+                val ref = FirebaseStorage.getInstance().getReference("${StorageLocations.SAVED_DRAWING_THUMB}/${UUID.randomUUID()}")
+
+                ref.putBytes(bitmapToByteArray(newThumbBitmap)).addOnSuccessListener {
+                    ref.downloadUrl.addOnSuccessListener{
+                        updateSaveToRef.child("thumbUri").setValue("$it").addOnSuccessListener {
+                            oldThumbRef.delete().addOnSuccessListener {
+                                println("Thumbnail Updated")
+                            }
+                        }
+                    }
+                }
+            }
+
         }
     }
 }

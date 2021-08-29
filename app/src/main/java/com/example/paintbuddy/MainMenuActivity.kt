@@ -89,9 +89,8 @@ class MainMenuActivity : AppCompatActivity(), DrawListener {
     }
 
     override fun onSavedMenuDeleteBtnClicked(drawItem: SavedItem) {
-        deleteDrawing(this, drawItem)
+        deleteDrawing(this, drawItem.userId, drawItem.drawId, drawItem.thumbUri)
     }
-
 
     private fun getSavedDrawings(){
         val ref = FirebaseDatabase.getInstance().getReference("$SAVED_DRAWINGS/${FirebaseAuth.getInstance().uid}/")

@@ -36,9 +36,11 @@ import com.example.paintbuddy.imageOperations.ImageResizer
 import com.example.paintbuddy.local.DeleteCache.deleteCache
 import com.example.paintbuddy.updateDrawing.UpdateOperations
 import com.example.paintbuddy.updateDrawing.UpdateSavedDrawings.Companion.bitmapToByteArray
+import com.example.paintbuddy.updateDrawing.UpdateSavedDrawings.Companion.deleteDrawing
 //import com.example.paintbuddy.updateDrawing.UpdateOperations.Companion.bgColor
 //import com.example.paintbuddy.updateDrawing.UpdateOperations.Companion.updateScreenResolution
 import com.example.paintbuddy.updateDrawing.UpdateSavedDrawings.Companion.saveDrawing
+import com.example.paintbuddy.updateDrawing.UpdateSavedDrawings.Companion.updateSavedDrawing
 import com.example.paintbuddy.updateDrawing.UploadDrawingInfo
 import com.example.paintbuddy.updateDrawing.UploadDrawingInfo.Companion.addDrawInfoToFirebase
 import com.example.paintbuddy.updateDrawing.UploadDrawingInfo.Companion.BgColor
@@ -465,45 +467,22 @@ class MainActivity : AppCompatActivity() {
         timer.purge()
 
         Thread{
-            if (drawId == "NEW" && canvas.pathList.size > 0){
-                saveDrawing(drawingId, getBitmapFromView(canvas, true), "Untitled", drawList.size.toLong())
-            }else{
-                try{
-                    updateSavedDrawing(drawList.size, credentials[0], credentials[1], credentials[2])
-                }catch (e: Exception){
-                    e.stackTrace
-                }
-            }
-        }.start()
-        super.onDestroy()
-    }
-
-    private fun updateSavedDrawing(childCount: Int, userId: String, drawingId: String, thumb: String){
-        val updateSaveToRef = FirebaseDatabase.getInstance().getReference(DatabaseLocations.SAVED_DRAWINGS).child(userId).child(drawingId)
-        updateSaveToRef.child("nodeCount").setValue(childCount).addOnSuccessListener {
-            println("Node Count Updated")
-        }
-        updateSaveToRef.child("lastModified").setValue(System.currentTimeMillis()).addOnSuccessListener {
-            println("Last Modified Date Updated")
-        }
-        if (thumb != ""){
-            val oldThumbRef = FirebaseStorage.getInstance().getReferenceFromUrl(thumb)
-
-            val newBitmap = getBitmapFromView(canvas, true)
-            val newThumbBitmap = ImageResizer.generateThumb(newBitmap, 120000)
-            val ref = FirebaseStorage.getInstance().getReference("${StorageLocations.SAVED_DRAWING_THUMB}/${UUID.randomUUID()}")
-
-            ref.putBytes(bitmapToByteArray(newThumbBitmap)).addOnSuccessListener {
-                ref.downloadUrl.addOnSuccessListener{
-                    updateSaveToRef.child("thumbUri").setValue("$it").addOnSuccessListener {
-                        oldThumbRef.delete().addOnSuccessListener {
-                            println("Thumbnail Updated")
-                        }
+            if (canvas.pathList.size > 0){
+                if (drawId == "NEW"){
+                    saveDrawing(drawingId, getBitmapFromView(canvas, true), "Untitled", drawList.size.toLong())
+                }else{
+                    try{
+                        updateSavedDrawing(drawList.size, credentials[0], credentials[1], credentials[2], getBitmapFromView(canvas, true))
+                    }catch (e: Exception){
+                        e.stackTrace
                     }
                 }
+            }else if (drawId != "NEW"){
+                deleteDrawing(this, credentials[0], credentials[1], credentials[2])
             }
-        }
 
+        }.start()
+        super.onDestroy()
     }
 
 }
