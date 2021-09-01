@@ -34,7 +34,6 @@ class MainMenuActivity : AppCompatActivity(), DrawListener {
 
         fab.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
-//            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             intent.putExtra(NEW_DRAW_ID, "NEW")
             startActivity(intent)
         }
@@ -44,7 +43,9 @@ class MainMenuActivity : AppCompatActivity(), DrawListener {
         drawingRecyclerView.adapter = this.adapter
 
 
-        getSavedDrawings()
+        if (FirebaseAuth.getInstance().uid != null){
+            getSavedDrawings()
+        }
     }
 
     override fun onDrawItemClicked(drawItem: SavedItem) {

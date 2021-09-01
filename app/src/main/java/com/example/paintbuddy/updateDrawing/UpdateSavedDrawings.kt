@@ -24,32 +24,33 @@ class UpdateSavedDrawings {
 
     companion object {
 
-        fun saveDrawing(drawingId: String, thumb : Bitmap,  title: String = "", itemCount: Long){
-            uploadThumbnail(thumb, drawingId, title, itemCount)
+        fun saveDrawing(userId: String, drawingId: String, thumb : Bitmap,  title: String = "", itemCount: Long){
+            saveDrawingToDatabase(userId, drawingId, thumb, title, itemCount)
         }
 
-        private fun uploadThumbnail(bitmap: Bitmap, id : String, title: String, itemCount: Long){
+        private fun uploadThumbnail(bitmap: Bitmap, userId: String, id : String){
             val ref = FirebaseStorage.getInstance().getReference("$SAVED_DRAWING_THUMB/$id")
             val thumb = ImageResizer.generateThumb(bitmap, 120000)
             ref.putBytes(bitmapToByteArray(thumb)).addOnSuccessListener {
                 Log.d("SaveDrawing", "Uploaded thumbnail :: success")
 
                 ref.downloadUrl.addOnSuccessListener {
-                    saveDrawingToDatabase(id, "$it", title, itemCount)
+                    updateSavedDrawingThumbnail(userId, id, "$it")
                 }
             }
         }
 
-        private fun saveDrawingToDatabase(drawingId: String, thumb : String,  title: String, itemCount: Long){
-            val saveToRef = FirebaseDatabase.getInstance().getReference("$SAVED_DRAWINGS/${FirebaseAuth.getInstance().uid}/").child(drawingId)
+        private fun saveDrawingToDatabase(userId: String, drawingId: String, thumb : Bitmap,  title: String, itemCount: Long){
+            val saveToRef = FirebaseDatabase.getInstance().getReference("$SAVED_DRAWINGS/${userId}/").child(drawingId)
             val currentTime = System.currentTimeMillis()
-            val savedItem = SavedItem(drawingId, "${FirebaseAuth.getInstance().uid}", title, thumb, currentTime, currentTime, itemCount)
+            val savedItem = SavedItem(drawingId, userId, title, "", currentTime, currentTime, itemCount)
             saveToRef.setValue(savedItem).addOnSuccessListener {
                 Log.d("SaveDrawing", "Saved Drawing :: success")
+                uploadThumbnail(thumb, userId, drawingId)
             }
         }
 
-        fun bitmapToByteArray(bitmap: Bitmap): ByteArray {
+        private fun bitmapToByteArray(bitmap: Bitmap): ByteArray {
             val stream = ByteArrayOutputStream()
             bitmap.compress(Bitmap.CompressFormat.JPEG, 90, stream)
 
@@ -64,6 +65,14 @@ class UpdateSavedDrawings {
                 Toast.makeText(context, "Rename Successful", Toast.LENGTH_SHORT).show()
             }
         }
+
+        private fun updateSavedDrawingThumbnail(userId: String, drawingId: String, thumbUri: String) {
+            val saveToRef = FirebaseDatabase.getInstance().getReference("${DatabaseLocations.SAVED_DRAWINGS}/${userId}/").child(drawingId)
+            saveToRef.child("thumbUri").setValue(thumbUri).addOnSuccessListener {
+                Log.d("SaveDrawing", "Saved :: success")
+            }
+        }
+
 
         fun deleteDrawing(context: Context, userId: String, drawingId: String, thumbUri: String){
             val saveToRef = FirebaseDatabase.getInstance().getReference("${DatabaseLocations.SAVED_DRAWINGS}/${userId}/").child(drawingId)

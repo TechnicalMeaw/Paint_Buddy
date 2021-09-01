@@ -172,6 +172,4 @@ public class CanvasView extends View {
         brushList.clear();
     }
 
-
-
 }

@@ -12,7 +12,14 @@ class ColorMap {
             "#AA66CC" to R.color.purple,
             "#FFBB33" to R.color.yellow,
             "#FFFFFF" to R.color.eraser,
-            "#AAAAAA" to R.color.gray
+            "#AAAAAA" to R.color.gray,
+
+            "#FF8282" to R.color.light_red,
+            "#FFFD82" to R.color.light_yellow,
+            "#EA82FF" to R.color.light_purple,
+            "#95FF82" to R.color.light_green,
+            "#82B8FF" to R.color.light_blue,
+            "#E1E1E1" to R.color.light_gray
         )
     }
 }

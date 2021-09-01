@@ -42,12 +42,13 @@ class DrawViewRVAdapter(val context: Context, private val listener: DrawListener
         val currentDrawing = allDrawings[position]
         val options: RequestOptions = RequestOptions()
             .centerCrop()
-            .placeholder(R.drawable.brush)
-            .error(R.drawable.brush)
-        Glide.with(context).load(currentDrawing.thumbUri).apply(options).into(holder.thumb)
+            .placeholder(R.drawable.brush_thumb)
+            .error(R.drawable.brush_thumb)
 
         holder.title.text = currentDrawing.title
         holder.date.text = getDate(currentDrawing.lastModified)
+        Glide.with(context).load(currentDrawing.thumbUri).apply(options).into(holder.thumb)
+
         holder.toolbar.setOnMenuItemClickListener( object : MenuItem.OnMenuItemClickListener,
             Toolbar.OnMenuItemClickListener {
 
