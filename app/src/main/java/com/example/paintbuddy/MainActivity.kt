@@ -37,7 +37,6 @@ import com.example.paintbuddy.updateDrawing.UpdateSavedDrawings.Companion.update
 import com.example.paintbuddy.updateDrawing.UploadDrawingInfo
 import com.example.paintbuddy.updateDrawing.UploadDrawingInfo.Companion.addDrawInfoToFirebase
 import com.example.paintbuddy.updateDrawing.UploadDrawingInfo.Companion.BgColor
-import com.example.paintbuddy.updateDrawing.UploadDrawingInfo.Companion.color
 import com.example.paintbuddy.updateDrawing.UploadDrawingInfo.Companion.drawList
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.ChildEventListener
@@ -51,6 +50,10 @@ import java.io.OutputStream
 import java.util.*
 import kotlin.concurrent.timerTask
 import android.view.MotionEvent
+import com.example.paintbuddy.dialogBox.LoadingScreen
+import com.example.paintbuddy.dialogBox.LoadingScreen.Companion.hideLoadingDialog
+import com.example.paintbuddy.dialogBox.LoadingScreen.Companion.mAlertDialog
+import com.example.paintbuddy.dialogBox.LoadingScreen.Companion.showLoadingDialog
 
 
 class MainActivity : AppCompatActivity() {
@@ -61,6 +64,7 @@ class MainActivity : AppCompatActivity() {
 
     private var drawId = ""
     private lateinit var credentials : List<String>
+    private var isEdited : Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -74,10 +78,8 @@ class MainActivity : AppCompatActivity() {
         }else{
             credentials = drawId.split(" ")
             drawingId = credentials[1]
-            Thread{
-                retrieveSavedDrawing(credentials)
-            }.start()
 
+            retrieveSavedDrawing(credentials)
         }
 
         alphaSlider.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
@@ -111,6 +113,7 @@ class MainActivity : AppCompatActivity() {
         })
 
         undoToolBtn.setOnClickListener {
+
             canvas.undo()
             canvas.invalidate()
         }
@@ -154,9 +157,11 @@ class MainActivity : AppCompatActivity() {
         if (drawId == "NEW" && FirebaseAuth.getInstance().uid != null){
             update(drawingId)
         }
+
     }
 
     private fun retrieveSavedDrawing(list: List<String>) {
+        showLoadingDialog(this)
         val ref = FirebaseDatabase.getInstance().getReference("$DRAWING_LOCATION/${list[0]}/${list[1]}")
         val count = list[3].toInt()
         UploadDrawingInfo.init()
@@ -178,7 +183,10 @@ class MainActivity : AppCompatActivity() {
 
                             val brush = brushInit(color, stroke.toFloat(), alpha.toInt())
                             canvas.brushList.add(brush)
-
+                            canvas.currentAlpha = alpha.toInt()
+                            canvas.currentStroke = stroke.toFloat()
+                            //change the current brush
+                            changeColor(color)
                             BgColor = snapshot.child("bgColor").value as String
 
                             ColorMap.map[BgColor]?.let { changeBgColor(BgColor) }
@@ -188,21 +196,25 @@ class MainActivity : AppCompatActivity() {
                             if (snapshot.key!!.toInt() >= count - 1){
                                 ref.removeEventListener(this)
                                 update(list[1])
+                                hideLoadingDialog()
                             }
                         }
                     }catch (e: Exception){
                         Log.e("MainActivity", "$e")
+                        hideLoadingDialog()
                     }
                 }
             }
 
             override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
                 ref.removeEventListener(this)
+                hideLoadingDialog()
             }
 
             override fun onChildRemoved(snapshot: DataSnapshot) {
                 println("Child Removed")
                 ref.removeEventListener(this)
+                hideLoadingDialog()
             }
 
             override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
@@ -240,8 +252,8 @@ class MainActivity : AppCompatActivity() {
                 if ((canvas.pathList.size != pl || canvas.backgroundColor != bgColor) && flag == false){
 
                     try {
-
-                        addDrawInfoToFirebase(canvas.pathList, canvas.currentStroke, canvas.currentAlpha, location)
+                        isEdited = true
+                        addDrawInfoToFirebase(canvas.pathList, canvas.brushList, location)
                         updater.updateScreenResolution(canvas.width, canvas.height)
                         Log.d("MainActivity", "Updated Drawing :: Success")
 
@@ -274,9 +286,10 @@ class MainActivity : AppCompatActivity() {
                 canvas.invalidate()
             }
             R.id.redoBtn -> {
+                canvas.brushList[canvas.brushList.lastIndex].alpha
                 canvas.redo()
                 canvas.invalidate()
-                addDrawInfoToFirebase(canvas.pathList, canvas.currentStroke, canvas.currentAlpha)
+                addDrawInfoToFirebase(canvas.pathList, canvas.brushList)
             }
             R.id.clearBtn -> {
                 canvas.clear()
@@ -331,12 +344,11 @@ class MainActivity : AppCompatActivity() {
     private fun changeColor(currentBrushColor: String){
         canvas.changeBrush(true)
 
-        color = currentBrushColor
-        canvas.currentColor = Color.parseColor(color)
+        canvas.currentColor = Color.parseColor(currentBrushColor)
         brushToolBtn.backgroundTintList =
-            ColorMap.map[color]?.let { ContextCompat.getColorStateList(this, it) }
+            ColorMap.map[currentBrushColor]?.let { ContextCompat.getColorStateList(this, it) }
 
-        canvas.erase = currentBrushColor != "#FFFFFF"
+        canvas.erase = currentBrushColor == "#FFFFFF"
     }
 
     fun configBrush(view: View) {
@@ -442,14 +454,14 @@ class MainActivity : AppCompatActivity() {
             if (canvas.pathList.size > 0){
                 if (drawId == "NEW"){
                     saveDrawing(FirebaseAuth.getInstance().uid.toString(), drawingId, getBitmapFromView(canvas, true), "Untitled", drawList.size.toLong())
-                }else{
+                }else if (isEdited){
                     try{
                         updateSavedDrawing(drawList.size, credentials[0], credentials[1], credentials[2], getBitmapFromView(canvas, true))
                     }catch (e: Exception){
                         e.stackTrace
                     }
                 }
-            }else if (drawId != "NEW"){
+            }else if (drawId != "NEW" && !(LoadingScreen.mAlertDialog.isShowing)){
                 deleteDrawing(this, credentials[0], credentials[1], credentials[2])
             }
 

@@ -36,8 +36,6 @@ public class CanvasView extends View {
     public ArrayList<CustomPath> pathBufferList = new ArrayList<>();
     public ArrayList<CustomPaint> brushBufferList = new ArrayList<>();
 
-//    private List<String> stringPaths = new ArrayList<String>();
-
 
     public CanvasView(Context context) {
         super(context);
