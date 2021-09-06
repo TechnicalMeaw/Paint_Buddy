@@ -8,10 +8,12 @@ import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.bumptech.glide.Glide
+
 import com.example.paintbuddy.constants.DatabaseLocations.Companion.USERINFO_LOCATION
 import com.example.paintbuddy.constants.IntentStrings.Companion.COUNTRY
 import com.example.paintbuddy.constants.IntentStrings.Companion.PHONE_NUMBER
+import com.example.paintbuddy.dialogBox.LoadingScreen.Companion.hideLoadingDialog
+import com.example.paintbuddy.dialogBox.LoadingScreen.Companion.showLoadingDialog
 import com.google.firebase.FirebaseException
 import com.google.firebase.FirebaseTooManyRequestsException
 import com.google.firebase.auth.*
@@ -21,6 +23,7 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.android.synthetic.main.activity_verify_code.*
+import kotlinx.android.synthetic.main.activity_verify_code.view.*
 import java.util.concurrent.TimeUnit
 
 class VerifyCodeActivity : AppCompatActivity() {
@@ -31,17 +34,10 @@ class VerifyCodeActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_verify_code)
 
-//        Glide.with(this).load(R.drawable.background_default).centerCrop().into(verifyBg)
-
         phoneNumber = intent.getStringExtra(PHONE_NUMBER)!!
         countryName = intent.getStringExtra(COUNTRY)!!
 
         verifyPhoneNumber.text = " " + phoneNumber.substring(0,phoneNumber.length - 10) + "-" + phoneNumber.substring(phoneNumber.length-10,phoneNumber.length)
-
-//        verifyCodeBtn.setOnClickListener {
-//            val intent = Intent(this, RegisterUserActivity::class.java)
-//            startActivity(intent)
-//        }
 
         // Send the OTP to phoneNumber
         sendCode(phoneNumber)
@@ -82,7 +78,7 @@ class VerifyCodeActivity : AppCompatActivity() {
             token
         ) // ForceResendingToken from callbacks
 
-        Toast.makeText(this, "Code Sent.", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "Sending New Code...", Toast.LENGTH_SHORT).show()
         startCountdown()
     }
 
@@ -107,6 +103,9 @@ class VerifyCodeActivity : AppCompatActivity() {
             // val user = FirebaseAuth.getInstance().currentUser
             // updateUI(user)
             signInWithPhoneAuthCredential(credential)
+
+            // Show loading Dialog
+            showLoadingDialog(this@VerifyCodeActivity)
         }
 
         override fun onVerificationFailed(e: FirebaseException) {
@@ -130,6 +129,9 @@ class VerifyCodeActivity : AppCompatActivity() {
             // Show a message and update the UI
             // ...
             Toast.makeText(this@VerifyCodeActivity, "Failed", Toast.LENGTH_SHORT).show()
+
+            // Dismiss loading dialog
+            hideLoadingDialog()
         }
 
         override fun onCodeSent(
@@ -161,11 +163,14 @@ class VerifyCodeActivity : AppCompatActivity() {
 
     fun resendCode(view: View) {
         resendVerificationCode(phoneNumber, resendToken!!)
-        resendCodeTextView.isClickable = false
+        view.resendCodeTextView.isClickable = false
     }
 
     fun verifyCode(view: View) {
-        verifyVerificationCode(loginOTPEditText.text.toString())
+        verifyVerificationCode(view.loginOTPEditText.text.toString())
+
+        // Show loading Dialog
+        showLoadingDialog(this@VerifyCodeActivity)
     }
 
 
@@ -189,7 +194,12 @@ class VerifyCodeActivity : AppCompatActivity() {
                     }else{
                         Toast.makeText(this, "Failed", Toast.LENGTH_LONG).show()
                     }
+
+                    // Dismiss loading dialog
+                    hideLoadingDialog()
                 }
+
+
             }
     }
 
@@ -207,6 +217,9 @@ class VerifyCodeActivity : AppCompatActivity() {
                 }else{
                     redirectToEnterUserInfo()
                 }
+
+                // Dismiss loading dialog
+                hideLoadingDialog()
             }
 
             override fun onCancelled(error: DatabaseError) {

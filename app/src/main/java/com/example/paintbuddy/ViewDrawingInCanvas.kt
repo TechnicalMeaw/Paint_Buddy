@@ -63,10 +63,8 @@ class ViewDrawingInCanvas : AppCompatActivity() {
         return brush
     }
 
-    var drawMap : HashMap<String, CustomPath> = HashMap()
-    var brushColorMap : HashMap<String, String> = HashMap()
-    var strokeMap : HashMap<String, Float> = HashMap()
-    var alphaMap : HashMap<String, Int> = HashMap()
+    var drawMap : HashMap<Int, CustomPath> = HashMap()
+    var brushMap: HashMap<Int, Paint> = HashMap()
 
     private fun updateCanvas(view: ImageView){
         drawRef.addChildEventListener(object : ChildEventListener{
@@ -81,18 +79,15 @@ class ViewDrawingInCanvas : AppCompatActivity() {
                         bgColor = snapshot.child("bgColor").value as String
 
 
-                        drawMap[snapshot.key.toString()] = convertStringToPath(path)
-                        brushColorMap[snapshot.key.toString()] = brushColor
-                        strokeMap[snapshot.key.toString()] = brushStroke.toFloat()
-                        alphaMap[snapshot.key.toString()] = brushAlpha.toInt()
+                        drawMap[snapshot.key!!.toInt()] = convertStringToPath(path)
+                        brushMap[snapshot.key!!.toInt()] = brushInit(brushColor, brushStroke.toFloat(), brushAlpha.toInt())
+
                     }catch (e: Exception){
                         drawMap.clear()
-                        brushColorMap.clear()
-                        strokeMap.clear()
-                        alphaMap.clear()
+                        brushMap.clear()
                         println(e)
                     }
-                    updateCanvas(drawMap, brushColorMap, view)
+                    updateCanvas(drawMap, brushMap, view)
                 }else{
                     Toast.makeText(this@ViewDrawingInCanvas, "Link Expired", Toast.LENGTH_SHORT).show()
                 }
@@ -104,35 +99,33 @@ class ViewDrawingInCanvas : AppCompatActivity() {
                     getScreenRes(viewDrawingCanvas)
                     try {
                         val path = snapshot.child("drawPath").value as String
+                        val brushColor = snapshot.child("brushColor").value as String
+                        val brushStroke = snapshot.child("brushStroke").value as Long
+                        val brushAlpha = snapshot.child("brushAlpha").value as Long
                         bgColor = snapshot.child("bgColor").value as String
 
-                        drawMap[snapshot.key.toString()] = convertStringToPath(path)
+                        drawMap[snapshot.key!!.toInt()] = convertStringToPath(path)
+                        brushMap[snapshot.key!!.toInt()] = brushInit(brushColor, brushStroke.toFloat(), brushAlpha.toInt())
                     }catch (e: Exception){
                         drawMap.clear()
-                        brushColorMap.clear()
-                        strokeMap.clear()
-                        alphaMap.clear()
+                        brushMap.clear()
                         println(e)
                     }
                 }else{
                     drawMap.clear()
-                    brushColorMap.clear()
-                    strokeMap.clear()
-                    alphaMap.clear()
+                    brushMap.clear()
                 }
 
-                updateCanvas(drawMap, brushColorMap, view)
+                updateCanvas(drawMap, brushMap, view)
             }
 
             override fun onChildRemoved(snapshot: DataSnapshot) {
-                drawMap.remove(snapshot.key.toString())
-                brushColorMap.remove(snapshot.key.toString())
-                strokeMap.remove(snapshot.key.toString())
-                alphaMap.remove(snapshot.key.toString())
+                drawMap.remove(snapshot.key!!.toInt())
+                brushMap.remove(snapshot.key!!.toInt())
 
                 println("Child Removed")
 
-                updateCanvas(drawMap, brushColorMap, view)
+                updateCanvas(drawMap, brushMap, view)
             }
 
             override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
@@ -155,7 +148,7 @@ class ViewDrawingInCanvas : AppCompatActivity() {
                     val h = snapshot.child("height").value as Long
                     width = w.toInt()
                     height = h.toInt()
-                    updateCanvas(drawMap, brushColorMap, view)
+                    updateCanvas(drawMap, brushMap, view)
 
                 }catch (e: Exception){
                     Toast.makeText(this@ViewDrawingInCanvas, "Invalid Link", Toast.LENGTH_SHORT).show()
@@ -170,12 +163,12 @@ class ViewDrawingInCanvas : AppCompatActivity() {
 
     }
 
-   fun updateCanvas(pathMap: HashMap<String, CustomPath>, colorMap: HashMap<String, String>, view: ImageView){
-       if (pathMap.size == colorMap.size)
-           drawToCanvas(pathMap, colorMap, view)
+   fun updateCanvas(pathMap: HashMap<Int, CustomPath>, brushMap: HashMap<Int, Paint>, view: ImageView){
+       if (pathMap.size == brushMap.size)
+           drawToCanvas(pathMap, brushMap, view)
    }
 
-    private fun drawToCanvas(pathMap: HashMap<String, CustomPath>, colorMap: HashMap<String, String>, view: ImageView){
+    private fun drawToCanvas(pathMap: HashMap<Int, CustomPath>, brushMap: HashMap<Int, Paint>, view: ImageView){
         val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
 
@@ -183,8 +176,7 @@ class ViewDrawingInCanvas : AppCompatActivity() {
             if (pathMap.isNotEmpty()){
                 pathMap.toSortedMap().forEach { it ->
 
-                    val brush = brushInit(colorMap[it.key]!!, strokeMap[it.key]!!, alphaMap[it.key.toString()]!!)
-                    canvas.drawPath(it.value, brush)
+                    brushMap[it.key]?.let { brush -> canvas.drawPath(it.value, brush) }
                 }
             }
 

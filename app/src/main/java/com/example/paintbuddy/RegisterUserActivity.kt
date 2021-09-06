@@ -19,6 +19,8 @@ import com.example.paintbuddy.constants.IntentStrings.Companion.CHOOSE_IMAGE
 import com.example.paintbuddy.constants.IntentStrings.Companion.COUNTRY
 import com.example.paintbuddy.constants.IntentStrings.Companion.PHONE_NUMBER
 import com.example.paintbuddy.constants.StorageLocations
+import com.example.paintbuddy.dialogBox.LoadingScreen.Companion.hideLoadingDialog
+import com.example.paintbuddy.dialogBox.LoadingScreen.Companion.showLoadingDialog
 import com.example.paintbuddy.firebaseClasses.UserItem
 import com.example.paintbuddy.imageOperations.ImageResizer
 import com.example.paintbuddy.local.LocalStorage
@@ -49,6 +51,7 @@ class RegisterUserActivity : AppCompatActivity() {
         notificationToken = MyFirebaseMessagingService.token.toString()
         countryName = intent.getStringExtra(COUNTRY).toString()
 
+        // Initialize shared preferences
         LocalStorage.sharedPref = getSharedPreferences("sharedPref", Context.MODE_PRIVATE)
 
         createAccountButton.setOnClickListener {
@@ -66,6 +69,8 @@ class RegisterUserActivity : AppCompatActivity() {
                 }else{
                     uploadImageToFirebaseAndRegisterUser(imageBitmap)
                 }
+                // show Loading Dialog
+                showLoadingDialog(this)
             }else{
                 Toast.makeText(this, "Empty Fields", Toast.LENGTH_SHORT).show()
             }
@@ -82,13 +87,17 @@ class RegisterUserActivity : AppCompatActivity() {
                 dpUrl = it.toString()
                 registerUserToDatabase(firstName, lastName, phoneNumber, countryName, email, notificationToken)
             }
+        }.removeOnFailureListener {
+            Toast.makeText(this, "Failed", Toast.LENGTH_SHORT).show()
+            // Hide Loading Dialog
+            hideLoadingDialog()
         }
     }
 
     private fun bitmapToByteArray(bitmap: Bitmap): ByteArray {
-        val bitmap = ImageResizer.generateThumb(bitmap, 25000)
+        val newBitmap = ImageResizer.generateThumb(bitmap, 25000)
         val stream = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 90, stream)
+        newBitmap.compress(Bitmap.CompressFormat.JPEG, 90, stream)
 
         return stream.toByteArray()
     }
@@ -99,11 +108,18 @@ class RegisterUserActivity : AppCompatActivity() {
         val user = UserItem(firstName, lastName, phoneNumber, email, dpUrl, countryName, FirebaseAuth.getInstance().uid.toString(), notificationToken, "normal")
         ref.setValue(user).addOnSuccessListener {
             Toast.makeText(this, "Account Created", Toast.LENGTH_SHORT).show()
-//            LocalStorage.sharedPref = getSharedPreferences("sharedPref", Context.MODE_PRIVATE)
             status = "registered"
+
+            // Hide Loading Dialog
+            hideLoadingDialog()
+
             val intent = Intent(this, MainMenuActivity::class.java)
             startActivity(intent)
             finish()
+        }.addOnFailureListener {
+            Toast.makeText(this, "Failed", Toast.LENGTH_SHORT).show()
+            // Hide Loading Dialog
+            hideLoadingDialog()
         }
     }
 
@@ -114,6 +130,7 @@ class RegisterUserActivity : AppCompatActivity() {
     }
 
 
+    var imageUri: Uri? = null
     private var resultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
             // There are no request codes
@@ -128,20 +145,6 @@ class RegisterUserActivity : AppCompatActivity() {
         }
     }
 
-
-    var imageUri: Uri? = null
-
-//    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-//        super.onActivityResult(requestCode, resultCode, data)
-//        if (requestCode == CHOOSE_IMAGE && resultCode == Activity.RESULT_OK && data != null){
-//            imageUri = data.data
-//            circleImageView.setImageURI(imageUri)
-//            circleImageView.invalidate()
-//            val dr = circleImageView.drawable
-//            imageBitmap = dr.toBitmap()
-//            Glide.with(this).load(imageUri).into(circleImageView)
-//        }
-//    }
 
     private fun validateEmail(emailForValidation: String): Boolean{
         return Patterns.EMAIL_ADDRESS.matcher(emailForValidation).matches()

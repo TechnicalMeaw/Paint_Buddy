@@ -185,10 +185,15 @@ class MainActivity : AppCompatActivity() {
                             canvas.brushList.add(brush)
                             canvas.currentAlpha = alpha.toInt()
                             canvas.currentStroke = stroke.toFloat()
+
                             //change the current brush
                             changeColor(color)
-                            BgColor = snapshot.child("bgColor").value as String
+                            alphaSlider.progress = alpha.toInt()
+                            alphaSliderText.text = "$alpha"
+                            sizeSlider.progress = stroke.toInt()
+                            sizeSliderText.text = "$stroke"
 
+                            BgColor = snapshot.child("bgColor").value as String
                             ColorMap.map[BgColor]?.let { changeBgColor(BgColor) }
 
                             canvas.invalidate()
@@ -318,7 +323,7 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    fun Black(view: View) {
+    fun colorBlack(view: View) {
         changeColor("#000000")
     }
     fun Blue(view: View) {
@@ -440,9 +445,6 @@ class MainActivity : AppCompatActivity() {
         backgroundToolBtn.backgroundTintList = ContextCompat.getColorStateList(this, bgColor)
         backgroundExtraSpace.background = AppCompatResources.getDrawable(applicationContext, bgColor)
     }
-
-
-
 
 
 

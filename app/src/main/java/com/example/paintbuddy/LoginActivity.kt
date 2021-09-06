@@ -1,45 +1,25 @@
 package com.example.paintbuddy
 
-import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
-import com.bumptech.glide.Glide
-import com.example.paintbuddy.local.LocalStorage.Companion.status
-import com.example.paintbuddy.constants.DatabaseLocations
+
 import com.example.paintbuddy.constants.IntentStrings.Companion.COUNTRY
 import com.example.paintbuddy.constants.IntentStrings.Companion.PHONE_NUMBER
-import com.example.paintbuddy.local.LocalStorage
-import com.google.firebase.FirebaseApp
-import com.google.firebase.appcheck.FirebaseAppCheck
-import com.google.firebase.appcheck.safetynet.SafetyNetAppCheckProviderFactory
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
+
 import kotlinx.android.synthetic.main.activity_login.*
 import java.util.*
 import kotlin.concurrent.timerTask
 
 class LoginActivity : AppCompatActivity() {
 
-    var phoneNumber = ""
+    private var phoneNumber = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
-
-        // App Check
-        FirebaseApp.initializeApp(/*context=*/this)
-        val firebaseAppCheck = FirebaseAppCheck.getInstance()
-        firebaseAppCheck.installAppCheckProviderFactory(
-            SafetyNetAppCheckProviderFactory.getInstance()
-        )
-
-//        Glide.with(this).load(R.drawable.background_default).centerCrop().into(loginBg)
 
         nextButton.setOnClickListener {
             if (loginPhoneEditText.text!!.length == 10){

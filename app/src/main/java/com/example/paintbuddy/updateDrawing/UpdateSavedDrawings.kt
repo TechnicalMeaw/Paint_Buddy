@@ -9,6 +9,7 @@ import com.example.paintbuddy.constants.DatabaseLocations.Companion.DRAWING_LOCA
 import com.example.paintbuddy.constants.DatabaseLocations.Companion.SAVED_DRAWINGS
 import com.example.paintbuddy.constants.StorageLocations
 import com.example.paintbuddy.constants.StorageLocations.Companion.SAVED_DRAWING_THUMB
+import com.example.paintbuddy.dialogBox.LoadingScreen.Companion.hideLoadingDialog
 import com.example.paintbuddy.firebaseClasses.SavedItem
 import com.example.paintbuddy.imageOperations.ImageResizer
 import com.google.firebase.auth.FirebaseAuth
@@ -85,6 +86,9 @@ class UpdateSavedDrawings {
                     saveToRef.removeValue().addOnSuccessListener {
                         thumbRef.delete().addOnSuccessListener {
                             Toast.makeText(context, "Deleted", Toast.LENGTH_SHORT).show()
+
+                            //Hide Loading Dialog
+                            hideLoadingDialog()
                         }
                     }
                 }

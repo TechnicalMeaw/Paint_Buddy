@@ -1,13 +1,10 @@
 package com.example.paintbuddy
 
-import android.content.DialogInterface
+
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.text.InputType
-import android.widget.EditText
-import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
+
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.paintbuddy.constants.DatabaseLocations.Companion.SAVED_DRAWINGS
 
@@ -15,6 +12,7 @@ import com.example.paintbuddy.constants.IntentStrings.Companion.NEW_DRAW_ID
 import com.example.paintbuddy.constants.IntentStrings.Companion.SAVED_DRAWING_LOCATION
 import com.example.paintbuddy.customClasses.recyclerView.DrawListener
 import com.example.paintbuddy.customClasses.recyclerView.DrawViewRVAdapter
+import com.example.paintbuddy.dialogBox.DeleteWarning.Companion.showDeleteWarningDialog
 import com.example.paintbuddy.dialogBox.RenameBox.Companion.showRenameDialog
 import com.example.paintbuddy.firebaseClasses.SavedItem
 import com.example.paintbuddy.updateDrawing.UpdateSavedDrawings.Companion.deleteDrawing
@@ -90,11 +88,12 @@ class MainMenuActivity : AppCompatActivity(), DrawListener {
     }
 
     override fun onSavedMenuDeleteBtnClicked(drawItem: SavedItem) {
-        deleteDrawing(this, drawItem.userId, drawItem.drawId, drawItem.thumbUri)
+        showDeleteWarningDialog(this, drawItem)
     }
 
     private fun getSavedDrawings(){
         val ref = FirebaseDatabase.getInstance().getReference("$SAVED_DRAWINGS/${FirebaseAuth.getInstance().uid}/")
+        ref.keepSynced(true)
 
         ref.addChildEventListener(object : ChildEventListener{
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {

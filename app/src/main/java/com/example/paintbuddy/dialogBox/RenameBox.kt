@@ -14,7 +14,7 @@ import kotlinx.android.synthetic.main.rename_dialog_box.view.*
 class RenameBox {
     companion object{
 
-        fun showRenameDialog(context: Context, drawItem: SavedItem){
+        fun showRenameDialog(context: Context, savedItem: SavedItem){
 
             val mDialogView: View = LayoutInflater.from(context).inflate(R.layout.rename_dialog_box, null)
 
@@ -32,7 +32,7 @@ class RenameBox {
             mDialogView.renamePositiveButton.setOnClickListener {
                 val newTitle = mDialogView.renameEditText.text.toString()
                 if (newTitle != ""){
-                    updateSavedDrawingTitle(context, newTitle, drawItem)
+                    updateSavedDrawingTitle(context, newTitle, savedItem)
                     mAlertDialog.dismiss()
                 }else{
                     Toast.makeText(context, "Invalid Title", Toast.LENGTH_SHORT).show()

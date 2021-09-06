@@ -31,8 +31,6 @@ class FlashScreenActivity : AppCompatActivity() {
 
         LocalStorage.sharedPref = getSharedPreferences("sharedPref", Context.MODE_PRIVATE)
         checkStatus()
-
-//        Glide.with(this).load(R.drawable.background_default).centerCrop().into(flashScreenBg)
     }
 
     private fun checkStatus(){
