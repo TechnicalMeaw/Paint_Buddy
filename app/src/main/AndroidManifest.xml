@@ -15,7 +15,8 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".FlashScreenActivity"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -29,7 +30,8 @@
                 android:value=".LoginActivity" />
         </activity>
         <activity android:name=".LoginActivity"></activity>
-        <activity android:name=".ViewDrawingInCanvas">
+        <activity android:name=".ViewDrawingInCanvas"
+            android:exported="true">
             <tools:validation testUrl="https://paintbuddy.com/drawing/jhkxEcxyyzS66DR5rn4GC4YkaOa2" />
             <tools:validation testUrl="https://paintbuddy.com/drawing" />
 

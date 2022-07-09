@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.paintbuddy.constants.DatabaseLocations.Companion.USERINFO_LOCATION
 import com.example.paintbuddy.constants.IntentStrings.Companion.COUNTRY
 import com.example.paintbuddy.constants.IntentStrings.Companion.PHONE_NUMBER
+import com.example.paintbuddy.databinding.ActivityVerifyCodeBinding
 import com.example.paintbuddy.dialogBox.LoadingScreen.Companion.hideLoadingDialog
 import com.example.paintbuddy.dialogBox.LoadingScreen.Companion.showLoadingDialog
 import com.google.firebase.FirebaseException
@@ -30,19 +31,38 @@ class VerifyCodeActivity : AppCompatActivity() {
     private var phoneNumber = ""
     private var countryName = ""
     private var notificationToken: String? = ""
+    lateinit var binding: ActivityVerifyCodeBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_verify_code)
+
+        binding = ActivityVerifyCodeBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         phoneNumber = intent.getStringExtra(PHONE_NUMBER)!!
         countryName = intent.getStringExtra(COUNTRY)!!
 
-        verifyPhoneNumber.text = " " + phoneNumber.substring(0,phoneNumber.length - 10) + "-" + phoneNumber.substring(phoneNumber.length-10,phoneNumber.length)
+        binding.verifyPhoneNumber.text = " " + phoneNumber.substring(0,phoneNumber.length - 10) + "-" + phoneNumber.substring(phoneNumber.length-10,phoneNumber.length)
 
         // Send the OTP to phoneNumber
         sendCode(phoneNumber)
 
-        notYouBtn.setOnClickListener{ finish()}
+        // Resend Code
+        binding.resendCodeTextView.setOnClickListener {
+            resendVerificationCode(phoneNumber, resendToken!!)
+            binding.resendCodeTextView.isClickable = false
+        }
+
+        // Verify Code
+        binding.verifyCodeBtn.setOnClickListener {
+            verifyVerificationCode(binding.loginOTPEditText.text.toString())
+
+            // Show loading Dialog
+            showLoadingDialog(this@VerifyCodeActivity)
+        }
+
+        // Not you?
+        binding.notYouBtn.setOnClickListener{ finish()}
 
         // Setting Up Notification Token
         MyFirebaseMessagingService.sharedPref = getSharedPreferences("sharedPref", Context.MODE_PRIVATE)
@@ -131,7 +151,7 @@ class VerifyCodeActivity : AppCompatActivity() {
             Toast.makeText(this@VerifyCodeActivity, "Failed", Toast.LENGTH_SHORT).show()
 
             // Dismiss loading dialog
-            hideLoadingDialog()
+//            hideLoadingDialog()
         }
 
         override fun onCodeSent(
@@ -161,17 +181,6 @@ class VerifyCodeActivity : AppCompatActivity() {
         signInWithPhoneAuthCredential(credential)
     }
 
-    fun resendCode(view: View) {
-        resendVerificationCode(phoneNumber, resendToken!!)
-        view.resendCodeTextView.isClickable = false
-    }
-
-    fun verifyCode(view: View) {
-        verifyVerificationCode(view.loginOTPEditText.text.toString())
-
-        // Show loading Dialog
-        showLoadingDialog(this@VerifyCodeActivity)
-    }
 
 
     private fun signInWithPhoneAuthCredential(credential: PhoneAuthCredential) {
